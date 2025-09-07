@@ -14,7 +14,7 @@ if (error.value) {
 }
 </script>
 
-<style>
+<style scoped>
 body {
   font-family: sans-serif;
   padding: 2rem;
