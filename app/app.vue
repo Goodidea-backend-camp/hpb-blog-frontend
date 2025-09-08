@@ -1,3 +1,5 @@
+<!-- 以下僅為測試使用，實際使用時請刪除 -->
+
 <template>
   <div>
     <h1>HPB Blog Frontend</h1>
