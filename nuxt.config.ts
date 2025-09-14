@@ -1,18 +1,26 @@
+import tailwindcss from '@tailwindcss/vite'
+
 /// <reference types="node" />
-const backendPort = process.env.BACKEND_PORT || "8080";
+const backendPort = process.env.BACKEND_PORT || '8080'
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
   runtimeConfig: {
-    backendPort,
+    backendPort
   },
 
   routeRules: {
-    "/api/**": {
-      proxy: `http://backend:${backendPort}/**`,
-    },
+    '/api/**': {
+      proxy: `http://backend:${backendPort}/**`
+    }
   },
 
-  modules: ["@nuxt/eslint", "@nuxt/test-utils/module"],
-});
+  modules: ['@nuxt/eslint', '@nuxt/test-utils/module'],
+
+  vite: {
+    plugins: [tailwindcss()]
+  },
+
+  css: ['~/assets/css/main.css']
+})
