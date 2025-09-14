@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:eslint.nuxt.com)",
+      "WebSearch",
+      "Bash(mkdir:*)",
+      "WebFetch(domain:nuxt.com)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
