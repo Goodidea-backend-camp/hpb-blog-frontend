@@ -1,12 +1,12 @@
 .PHONY: format lint test
 
 format:
-	@npm run lint:fix >/dev/null 2>&1 || true
-	@npm run format >/dev/null 2>&1 || true
+	@npx eslint . --fix >/dev/null 2>&1 || true
+	@npx prettier --write . >/dev/null 2>&1 || true
 
 lint:
-	@npm run lint --silent
-	@npm run typecheck --silent
+	@npx eslint . --quiet
+	@npx nuxt typecheck --logLevel=silent
 
 test:
-	@npm run test -- --reporter=dot --silent
+	@npx vitest run --reporter=dot --silent
