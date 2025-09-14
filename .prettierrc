@@ -1,7 +1,8 @@
 {
-    "semi": false,
-    "singleQuote": true,
-    "printWidth": 100,
-    "plugins": ["prettier-plugin-tailwindcss"],
-    "tailwindFunctions": ["clsx", "cn", "cva"]
+  "semi": false,
+  "singleQuote": true,
+  "printWidth": 100,
+  "plugins": ["prettier-plugin-tailwindcss"],
+  "tailwindFunctions": ["clsx", "cn", "cva"],
+  "trailingComma": "none"
 }
