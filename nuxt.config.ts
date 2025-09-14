@@ -1,4 +1,5 @@
-const backendPort = process.env.BACKEND_PORT || '8080';
+/// <reference types="node" />
+const backendPort = process.env.BACKEND_PORT || "8080";
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -8,8 +9,10 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    '/api/**': {
+    "/api/**": {
       proxy: `http://backend:${backendPort}/**`,
     },
   },
-})
+
+  modules: ["@nuxt/eslint", "@nuxt/test-utils/module"],
+});
