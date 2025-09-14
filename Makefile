@@ -6,6 +6,7 @@ format:
 
 lint:
 	@npm run lint --silent
+	@npm run typecheck --silent
 
 test:
 	@npm run test -- --reporter=dot --silent

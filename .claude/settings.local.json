@@ -6,7 +6,9 @@
       "Bash(mkdir:*)",
       "WebFetch(domain:nuxt.com)",
       "WebFetch(domain:tailwindcss.nuxtjs.org)",
-      "Bash(make:*)"
+      "Bash(make:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run typecheck:*)"
     ],
     "deny": [],
     "ask": []
