@@ -4,7 +4,9 @@
       "WebFetch(domain:eslint.nuxt.com)",
       "WebSearch",
       "Bash(mkdir:*)",
-      "WebFetch(domain:nuxt.com)"
+      "WebFetch(domain:nuxt.com)",
+      "WebFetch(domain:tailwindcss.nuxtjs.org)",
+      "Bash(make:*)"
     ],
     "deny": [],
     "ask": []
