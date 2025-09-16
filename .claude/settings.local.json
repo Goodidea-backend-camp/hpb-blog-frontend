@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:eslint.nuxt.com)",
+      "WebSearch",
+      "Bash(mkdir:*)",
+      "WebFetch(domain:nuxt.com)",
+      "WebFetch(domain:tailwindcss.nuxtjs.org)",
+      "Bash(make:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run typecheck:*)",
+      "Bash(eslint --help)",
+      "Bash(npx nuxt typecheck:*)",
+      "Bash(vitest --help)",
+      "Bash(npx eslint:*)",
+      "Bash(npx vitest:*)",
+      "Bash(nvm:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
