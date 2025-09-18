@@ -5,7 +5,8 @@ import { Primitive } from 'reka-ui'
 import { cn } from '@/lib/utils'
 
 const props = withDefaults(defineProps<PrimitiveProps & { class?: HTMLAttributes['class'] }>(), {
-  as: 'a'
+  as: 'a',
+  class: ''
 })
 </script>
 

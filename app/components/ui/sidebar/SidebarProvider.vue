@@ -21,7 +21,8 @@ const props = withDefaults(
   }>(),
   {
     defaultOpen: !defaultDocument?.cookie.includes(`${SIDEBAR_COOKIE_NAME}=false`),
-    open: undefined
+    open: undefined,
+    class: ''
   }
 )
 

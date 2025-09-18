@@ -12,7 +12,9 @@ const props = withDefaults(
     }
   >(),
   {
-    as: 'button'
+    as: 'button',
+    showOnHover: false,
+    class: ''
   }
 )
 </script>
