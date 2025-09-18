@@ -15,7 +15,8 @@
       "Bash(npx eslint:*)",
       "Bash(npx vitest:*)",
       "Bash(nvm:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(lsof:*)"
     ],
     "deny": [],
     "ask": []
