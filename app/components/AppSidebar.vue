@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { SidebarProps } from '@/components/ui/sidebar'
 
-import { AudioWaveform, Command, FileText, GalleryVerticalEnd } from 'lucide-vue-next'
+import { FileText, Smile } from 'lucide-vue-next'
 import NavMain from '@/components/NavMain.vue'
 import NavUser from '@/components/NavUser.vue'
-import TeamSwitcher from '@/components/TeamSwitcher.vue'
+import SidebarBrand from '@/components/SidebarBrand.vue'
 
 import {
   Sidebar,
@@ -20,28 +20,16 @@ const props = withDefaults(defineProps<SidebarProps>(), {
 
 // This is sample data.
 const data = {
+  brand: {
+    title: 'Happy Partner Blog',
+    subtitle: 'Admin Panel',
+    icon: Smile
+  },
   user: {
     name: 'shadcn',
     email: 'm@example.com',
     avatar: '/avatars/shadcn.jpg'
   },
-  teams: [
-    {
-      name: 'Acme Inc',
-      logo: GalleryVerticalEnd,
-      plan: 'Enterprise'
-    },
-    {
-      name: 'Acme Corp.',
-      logo: AudioWaveform,
-      plan: 'Startup'
-    },
-    {
-      name: 'Evil Corp.',
-      logo: Command,
-      plan: 'Free'
-    }
-  ],
   navMain: [
     {
       title: 'Posts',
@@ -66,7 +54,11 @@ const data = {
 <template>
   <Sidebar v-bind="props">
     <SidebarHeader>
-      <TeamSwitcher :teams="data.teams" />
+      <SidebarBrand
+        :title="data.brand.title"
+        :subtitle="data.brand.subtitle"
+        :icon="data.brand.icon"
+      />
     </SidebarHeader>
     <SidebarContent>
       <NavMain :items="data.navMain" />
