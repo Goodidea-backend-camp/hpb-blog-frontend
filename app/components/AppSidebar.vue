@@ -1,17 +1,8 @@
 <script setup lang="ts">
 import type { SidebarProps } from '@/components/ui/sidebar'
 
-import {
-  AudioWaveform,
-  Command,
-  FileText,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
-  PieChart
-} from 'lucide-vue-next'
+import { AudioWaveform, Command, FileText, GalleryVerticalEnd } from 'lucide-vue-next'
 import NavMain from '@/components/NavMain.vue'
-import NavProjects from '@/components/NavProjects.vue'
 import NavUser from '@/components/NavUser.vue'
 import TeamSwitcher from '@/components/TeamSwitcher.vue'
 
@@ -68,23 +59,6 @@ const data = {
         }
       ]
     }
-  ],
-  projects: [
-    {
-      name: 'Design Engineering',
-      url: '#',
-      icon: Frame
-    },
-    {
-      name: 'Sales & Marketing',
-      url: '#',
-      icon: PieChart
-    },
-    {
-      name: 'Travel',
-      url: '#',
-      icon: Map
-    }
   ]
 }
 </script>
@@ -96,7 +70,6 @@ const data = {
     </SidebarHeader>
     <SidebarContent>
       <NavMain :items="data.navMain" />
-      <NavProjects :projects="data.projects" />
     </SidebarContent>
     <SidebarFooter>
       <NavUser :user="data.user" />
