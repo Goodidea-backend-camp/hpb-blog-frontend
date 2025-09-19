@@ -26,9 +26,7 @@ const data = {
     icon: Smile
   },
   user: {
-    name: 'shadcn',
-    email: 'm@example.com',
-    avatar: '/avatars/shadcn.jpg'
+    name: 'Username'
   },
   navMain: [
     {
