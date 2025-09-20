@@ -8,7 +8,7 @@ export default defineConfig({
         test: {
           name: 'unit',
           include: ['test/{e2e,unit}/*.{test,spec}.ts'],
-          environment: 'node'
+          environment: 'jsdom'
         }
       },
       await defineVitestProject({
