@@ -18,7 +18,6 @@ const props = withDefaults(defineProps<SidebarProps>(), {
   collapsible: 'icon'
 })
 
-// This is sample data.
 const data = {
   brand: {
     title: 'Happy Partner Blog',
