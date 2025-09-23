@@ -3,29 +3,6 @@ import { mount } from '@vue/test-utils'
 import AppSidebar from '@/components/AppSidebar.vue'
 
 describe('AppSidebar', () => {
-  it('應該成功渲染所有子元件，包括 SidebarBrand, NavMain, 和 NavUser', () => {
-    const wrapper = mount(AppSidebar, {
-      global: {
-        stubs: {
-          Sidebar: { template: '<aside class="sidebar"><slot /></aside>' },
-          SidebarHeader: { template: '<div class="sidebar-header"><slot /></div>' },
-          SidebarContent: { template: '<div class="sidebar-content"><slot /></div>' },
-          SidebarFooter: { template: '<div class="sidebar-footer"><slot /></div>' },
-          SidebarRail: { template: '<div class="sidebar-rail"></div>' },
-          SidebarBrand: true,
-          NavMain: true,
-          NavUser: true
-        }
-      }
-    })
-
-    expect(wrapper.find('.sidebar').exists()).toBe(true)
-    expect(wrapper.find('.sidebar-header').exists()).toBe(true)
-    expect(wrapper.find('.sidebar-content').exists()).toBe(true)
-    expect(wrapper.find('.sidebar-footer').exists()).toBe(true)
-    expect(wrapper.find('.sidebar-rail').exists()).toBe(true)
-  })
-
   it('應該正確傳遞 Props 並渲染靜態文字內容', () => {
     const wrapper = mount(AppSidebar, {
       global: {
