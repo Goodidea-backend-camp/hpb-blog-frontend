@@ -1,14 +1,23 @@
 import { defineConfig } from 'vitest/config'
 import { defineVitestProject } from '@nuxt/test-utils/config'
+import vue from '@vitejs/plugin-vue'
+import { fileURLToPath } from 'node:url'
 
 export default defineConfig({
   test: {
     projects: [
       {
+        plugins: [vue()],
         test: {
           name: 'unit',
           include: ['test/{e2e,unit}/*.{test,spec}.ts'],
-          environment: 'jsdom'
+          environment: 'happy-dom'
+        },
+        resolve: {
+          alias: {
+            '@': fileURLToPath(new URL('./app', import.meta.url)),
+            '@/*': fileURLToPath(new URL('./app/*', import.meta.url))
+          }
         }
       },
       await defineVitestProject({
