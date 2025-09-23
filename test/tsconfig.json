@@ -1,0 +1,8 @@
+{
+  "extends": "../.nuxt/tsconfig.app.json",
+  "compilerOptions": {
+    "composite": true,
+    "types": ["vitest/globals", "@vue/test-utils"]
+  },
+  "include": ["./**/*", "../app/**/*"]
+}
