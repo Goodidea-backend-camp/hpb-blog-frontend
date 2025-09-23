@@ -1,0 +1,2 @@
+# Mark shadcn/vue UI components as generated to collapse them in PR diffs
+app/components/ui/** linguist-generated=true
