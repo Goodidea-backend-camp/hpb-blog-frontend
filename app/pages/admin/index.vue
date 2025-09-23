@@ -6,10 +6,14 @@ definePageMeta({
 
 <template>
   <div>
-    <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-      <div data-testid="admin-stats-card" class="bg-muted/50 aspect-video rounded-xl" />
-      <div data-testid="admin-stats-card" class="bg-muted/50 aspect-video rounded-xl" />
-      <div data-testid="admin-stats-card" class="bg-muted/50 aspect-video rounded-xl" />
+    <div class="prose mb-6 max-w-none">
+      <h1>Admin Panel</h1>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
+        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+        laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
+        voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+      </p>
     </div>
     <div
       data-testid="admin-main-content"
