@@ -29,17 +29,17 @@ const data = {
   },
   navMain: [
     {
-      title: 'Posts',
+      title: 'Articles',
       url: '#',
       icon: FileText,
       isActive: true,
       items: [
         {
-          title: 'All posts',
+          title: 'Article list',
           url: '#'
         },
         {
-          title: 'Add post',
+          title: 'New article',
           url: '#'
         }
       ]
