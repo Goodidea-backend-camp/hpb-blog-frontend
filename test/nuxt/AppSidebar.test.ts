@@ -1,40 +1,44 @@
-import { describe, it, expect } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { describe, it, expect, vi } from 'vitest'
+import { mountSuspended } from '@nuxt/test-utils/runtime'
 import AppSidebar from '@/components/AppSidebar.vue'
 
+// Mock entire UI modules to avoid context injection issues
+vi.mock('@/components/ui/sidebar', () => ({
+  Sidebar: { template: '<div class="sidebar"><slot /></div>' },
+  SidebarHeader: { template: '<div class="sidebar-header"><slot /></div>' },
+  SidebarContent: { template: '<div class="sidebar-content"><slot /></div>' },
+  SidebarFooter: { template: '<div class="sidebar-footer"><slot /></div>' },
+  SidebarRail: { template: '<div class="sidebar-rail"></div>' }
+}))
+
+vi.mock('@/components/NavMain.vue', () => ({
+  default: {
+    props: ['items'],
+    template: '<nav class="nav-main">{{ items?.[0]?.title || "No items" }}</nav>'
+  }
+}))
+
+vi.mock('@/components/NavUser.vue', () => ({
+  default: {
+    props: ['user'],
+    template: '<div class="nav-user">{{ user?.name || "No user" }}</div>'
+  }
+}))
+
+vi.mock('@/components/SidebarBrand.vue', () => ({
+  default: {
+    props: ['title', 'subtitle', 'icon'],
+    template: '<div class="sidebar-brand">{{ title }} - {{ subtitle }}</div>'
+  }
+}))
+
 describe('AppSidebar', () => {
-  it('should correctly pass props and render static text content', () => {
-    const wrapper = mount(AppSidebar, {
-      global: {
-        stubs: {
-          Sidebar: { template: '<aside><slot /></aside>' },
-          SidebarHeader: { template: '<div><slot /></div>' },
-          SidebarContent: { template: '<div><slot /></div>' },
-          SidebarFooter: { template: '<div><slot /></div>' },
-          SidebarRail: { template: '<div></div>' },
-          SidebarBrand: {
-            props: ['title', 'subtitle', 'icon'],
-            template: '<div data-testid="sidebar-brand">{{ title }} - {{ subtitle }}</div>'
-          },
-          NavMain: {
-            props: ['items'],
-            template: '<nav data-testid="nav-main">{{ items?.[0]?.title || "No items" }}</nav>'
-          },
-          NavUser: {
-            props: ['user'],
-            template: '<div data-testid="nav-user">{{ user?.name || "No user" }}</div>'
-          }
-        }
-      }
-    })
+  it('should correctly pass props and render static text content', async () => {
+    const component = await mountSuspended(AppSidebar)
 
-    const sidebarBrand = wrapper.find('[data-testid="sidebar-brand"]')
-    expect(sidebarBrand.text()).toContain('Happy Partner Blog - Admin Panel')
-
-    const navMain = wrapper.find('[data-testid="nav-main"]')
-    expect(navMain.text()).toBe('Articles')
-
-    const navUser = wrapper.find('[data-testid="nav-user"]')
-    expect(navUser.text()).toBe('Username')
+    // Test the component renders correctly with mocked children
+    expect(component.html()).toContain('Happy Partner Blog - Admin Panel')
+    expect(component.html()).toContain('Articles')
+    expect(component.html()).toContain('Username')
   })
 })
