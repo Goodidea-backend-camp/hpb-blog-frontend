@@ -29,7 +29,7 @@ describe('AdminLayout', () => {
   it('should correctly render basic structure including AppSidebar and main content block', async () => {
     const component = await mountSuspended(AdminLayout, {
       slots: {
-        default: '<div class="slot-content">Test Content</div>'
+        default: () => '<div class="slot-content">Test Content</div>'
       }
     })
 
