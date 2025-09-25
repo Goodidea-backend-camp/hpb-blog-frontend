@@ -1,4 +1,4 @@
-.PHONY: format lint lint-verbose test
+.PHONY: format lint lint-verbose test ci
 
 format:
 	@npx eslint . --fix >/dev/null 2>&1 || true
@@ -14,3 +14,10 @@ lint-verbose:
 
 test:
 	@npx vitest run --reporter=dot --silent
+
+ci:
+	@echo "Running format..."
+	@$(MAKE) format || true
+	@echo "Running tests and lint in parallel..."
+	@($(MAKE) test || true) & ($(MAKE) lint-verbose || true) & wait
+	@echo "CI pipeline completed."

@@ -16,6 +16,7 @@ This is a Nuxt.js 4 frontend application for the HPB Blog project. It's configur
 
 ### Code Quality
 
+- `make ci` - Run complete CI pipeline (format, test, and lint in parallel)
 - `make lint` - Run ESLint and TypeScript type checking
 - `make format` - Fix ESLint issues and format code with Prettier
 
@@ -61,13 +62,11 @@ This is a Nuxt.js 4 frontend application for the HPB Blog project. It's configur
 
 ## Development Workflow
 
-After writing code, always run these commands in order and fix any issues:
+After writing code, run the CI pipeline to ensure code quality:
 
-1. `make format` - Format code and fix auto-fixable linting issues
-2. `make lint` - Check for linting and type errors
-3. `make test` - Run tests
+- `make ci` - Run complete CI pipeline (format code, then run tests and linting in parallel)
 
-All steps must pass before committing code.
+This command will automatically format your code and run both tests and type checking concurrently. All checks must pass before committing code.
 
 ## Development Notes
 

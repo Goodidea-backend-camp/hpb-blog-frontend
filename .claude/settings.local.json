@@ -18,7 +18,9 @@
       "mcp__ide__getDiagnostics",
       "Bash(lsof:*)",
       "Bash(npm run lint:*)",
-      "WebFetch(domain:lucide.dev)"
+      "WebFetch(domain:lucide.dev)",
+      "Bash(npm test:*)",
+      "Bash(npx nuxt:*)"
     ],
     "deny": [],
     "ask": []
