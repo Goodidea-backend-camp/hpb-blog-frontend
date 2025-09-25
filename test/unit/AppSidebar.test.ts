@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils'
 import AppSidebar from '@/components/AppSidebar.vue'
 
 describe('AppSidebar', () => {
-  it('應該正確傳遞 Props 並渲染靜態文字內容', () => {
+  it('should correctly pass props and render static text content', () => {
     const wrapper = mount(AppSidebar, {
       global: {
         stubs: {

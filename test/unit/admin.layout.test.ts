@@ -4,7 +4,7 @@ import AdminLayout from '@/layouts/admin.vue'
 import { h } from 'vue'
 
 describe('AdminLayout', () => {
-  it('應該正確渲染基本結構，包括 AppSidebar 和 main 內容區塊', () => {
+  it('should correctly render basic structure including AppSidebar and main content block', () => {
     const wrapper = mount(AdminLayout, {
       global: {
         stubs: {
@@ -31,7 +31,7 @@ describe('AdminLayout', () => {
     expect(wrapper.find('.slot-content').text()).toBe('Test Content')
   })
 
-  it('應該包含響應式 Breadcrumb 元素和正確的 CSS 類別', () => {
+  it('should contain responsive Breadcrumb elements and correct CSS classes', () => {
     const wrapper = mount(AdminLayout, {
       global: {
         stubs: {
