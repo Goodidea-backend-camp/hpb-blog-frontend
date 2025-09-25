@@ -32,7 +32,7 @@ describe('AppSidebar', () => {
     expect(sidebarBrand.text()).toContain('Happy Partner Blog - Admin Panel')
 
     const navMain = wrapper.find('[data-testid="nav-main"]')
-    expect(navMain.text()).toBe('Posts')
+    expect(navMain.text()).toBe('Articles')
 
     const navUser = wrapper.find('[data-testid="nav-user"]')
     expect(navUser.text()).toBe('Username')
