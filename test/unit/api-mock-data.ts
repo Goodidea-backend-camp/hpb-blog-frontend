@@ -79,6 +79,34 @@ export const createMockApiError = (
   message
 })
 
+/**
+ * Create mock API error with predefined messages for common status codes
+ */
+export const createMockApiErrorWithStatus = (
+  statusCode: 400 | 401 | 403 | 404 | 409 | 422 | 500,
+  message?: string
+) => {
+  const defaultMessages: Record<number, string> = {
+    400: 'Bad Request',
+    401: 'Unauthorized',
+    403: 'Forbidden',
+    404: 'Not Found',
+    409: 'Conflict',
+    422: 'Unprocessable Entity',
+    500: 'Internal Server Error'
+  }
+
+  return createMockApiError(statusCode, message || defaultMessages[statusCode])
+}
+
+/**
+ * Create incomplete error structure for edge case testing
+ */
+export const createIncompleteError = (parts: {
+  statusCode?: number
+  data?: { message?: string; [key: string]: unknown } | null
+}) => parts
+
 export const createMockArticlesList = (count: number = 3): Article[] => {
   return Array.from({ length: count }, (_, index) =>
     createMockArticle({

@@ -1,5 +1,6 @@
 import { ApiError } from '@/utils/errors'
 import { useJwtToken } from './useJwtToken'
+import { joinURL } from 'ufo'
 
 /**
  * API Client composable with automatic JWT token injection
@@ -18,7 +19,7 @@ export function useApiClient() {
       query?: Record<string, unknown>
     } = {}
   ): Promise<T> {
-    const url = `${baseURL}${endpoint}`
+    const url = joinURL(baseURL, endpoint)
 
     // Set default headers
     const headers: Record<string, string> = {
@@ -45,8 +46,8 @@ export function useApiClient() {
         statusCode?: number
         data?: { message?: string }
       }
-      const statusCode = errorObj.statusCode || 500
-      const message = errorObj.data?.message || 'An unknown error occurred'
+      const statusCode = errorObj.statusCode ?? 500
+      const message = errorObj.data?.message ?? 'An unknown error occurred'
 
       throw new ApiError(message, statusCode, errorObj.data)
     }
