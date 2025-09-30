@@ -131,7 +131,7 @@ describe('useApiClient', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(ApiError)
         expect((error as ApiError).statusCode).toBe(500)
-        expect((error as ApiError).message).toBe('發生未知錯誤')
+        expect((error as ApiError).message).toBe('An unknown error occurred')
       }
     })
   })

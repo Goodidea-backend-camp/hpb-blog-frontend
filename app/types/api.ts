@@ -1,5 +1,3 @@
-// API 型別定義，基於 swagger.yml
-
 export interface User {
   id: number
   username: string
