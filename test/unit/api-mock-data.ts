@@ -5,8 +5,7 @@ import type {
   NewArticle,
   UpdateArticle,
   LoginRequest,
-  LoginResponse,
-  PaginationParams
+  LoginResponse
 } from '@/types/api'
 
 export const createMockUser = (overrides: Partial<User> = {}): User => ({
@@ -58,14 +57,6 @@ export const createMockLoginRequest = (overrides: Partial<LoginRequest> = {}): L
 export const createMockLoginResponse = (overrides: Partial<LoginResponse> = {}): LoginResponse => ({
   token: 'mock-jwt-token',
   user: createMockUser(),
-  ...overrides
-})
-
-export const createMockPaginationParams = (
-  overrides: Partial<PaginationParams> = {}
-): PaginationParams => ({
-  page: 1,
-  limit: 10,
   ...overrides
 })
 

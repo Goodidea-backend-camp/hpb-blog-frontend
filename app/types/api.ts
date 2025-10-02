@@ -48,8 +48,3 @@ export interface LoginResponse {
 export interface ApiError {
   message: string
 }
-
-export interface PaginationParams {
-  page?: number
-  limit?: number
-}
