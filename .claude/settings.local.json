@@ -14,7 +14,8 @@
       "Bash(vitest --help)",
       "Bash(npx eslint:*)",
       "Bash(npx vitest:*)",
-      "Bash(nvm:*)"
+      "Bash(nvm:*)",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [],
     "ask": []
