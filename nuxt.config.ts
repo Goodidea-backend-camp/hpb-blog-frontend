@@ -16,11 +16,16 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: ['@nuxt/eslint', '@nuxt/test-utils/module'],
+  modules: ['@nuxt/eslint', '@nuxt/test-utils/module', 'shadcn-nuxt'],
 
   vite: {
     plugins: [tailwindcss()]
   },
 
-  css: ['~/assets/css/main.css']
+  css: ['~/assets/css/main.css'],
+
+  shadcn: {
+    prefix: '',
+    componentDir: './app/components/ui'
+  }
 })

@@ -1,0 +1,5 @@
+# Mark shadcn/vue UI components as generated to collapse them in PR diffs
+app/components/ui/** linguist-generated=true
+
+# Mark CLAUDE.md as generated to collapse it in PR diffs
+CLAUDE.md linguist-generated=true
