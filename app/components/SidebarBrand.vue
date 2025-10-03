@@ -7,10 +7,11 @@ const props = defineProps<{
   title: string
   subtitle: string
   icon: Component
+  url: string
 }>()
 
 function handleClick() {
-  navigateTo('/admin', { replace: true })
+  navigateTo(props.url, { replace: true })
 }
 </script>
 

@@ -22,7 +22,8 @@ const data = {
   brand: {
     title: 'Happy Partner Blog',
     subtitle: 'Admin Panel',
-    icon: Smile
+    icon: Smile,
+    url: '/admin'
   },
   user: {
     name: 'Username'
@@ -55,6 +56,7 @@ const data = {
         :title="data.brand.title"
         :subtitle="data.brand.subtitle"
         :icon="data.brand.icon"
+        :url="data.brand.url"
       />
     </SidebarHeader>
     <SidebarContent>

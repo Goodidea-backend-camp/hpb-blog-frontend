@@ -27,7 +27,7 @@ vi.mock('@/components/NavUser.vue', () => ({
 
 vi.mock('@/components/SidebarBrand.vue', () => ({
   default: {
-    props: ['title', 'subtitle', 'icon'],
+    props: ['title', 'subtitle', 'icon', 'url'],
     template: '<div class="sidebar-brand">{{ title }} - {{ subtitle }}</div>'
   }
 }))
