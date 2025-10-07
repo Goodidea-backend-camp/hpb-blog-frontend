@@ -1,5 +1,5 @@
 import type {
-  User,
+  LoginUser,
   AuthorInfo,
   Article,
   NewArticle,
@@ -8,11 +8,8 @@ import type {
   LoginResponse
 } from '@/types/api'
 
-export const createMockUser = (overrides: Partial<User> = {}): User => ({
-  id: 1,
+export const createMockUser = (overrides: Partial<LoginUser> = {}): LoginUser => ({
   username: 'testuser',
-  created_at: '2023-01-01T00:00:00Z',
-  updated_at: '2023-01-01T00:00:00Z',
   ...overrides
 })
 
