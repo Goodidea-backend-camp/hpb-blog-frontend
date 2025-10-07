@@ -66,7 +66,7 @@ export const createMockApiError = (
 ) => ({
   statusCode,
   status: statusCode,
-  data: { message },
+  data: { code: statusCode, message },
   message
 })
 
@@ -95,7 +95,7 @@ export const createMockApiErrorWithStatus = (
  */
 export const createIncompleteError = (parts: {
   statusCode?: number
-  data?: { message?: string; [key: string]: unknown } | null
+  data?: { code?: number; message?: string; [key: string]: unknown } | null
 }) => parts
 
 export const createMockArticlesList = (count: number = 3): Article[] => {

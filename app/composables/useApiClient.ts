@@ -44,12 +44,13 @@ export function useApiClient() {
       // Transform $fetch error into ApiError based on backend API spec
       const errorObj = error as {
         statusCode?: number
-        data?: { message?: string }
+        data?: { code?: number; message?: string }
       }
       const statusCode = errorObj.statusCode ?? 500
       const message = errorObj.data?.message ?? 'An unknown error occurred'
+      const code = errorObj.data?.code
 
-      throw new ApiError(message, statusCode, errorObj.data)
+      throw new ApiError(message, statusCode, errorObj.data, code)
     }
   }
 

@@ -161,7 +161,8 @@ describe('useApiClient', () => {
         expect(error).toBeInstanceOf(ApiError)
         expect((error as ApiError).statusCode).toBe(404)
         expect((error as ApiError).message).toBe('Not found')
-        expect((error as ApiError).response).toEqual({ message: 'Not found' })
+        expect((error as ApiError).code).toBe(404)
+        expect((error as ApiError).response).toEqual({ code: 404, message: 'Not found' })
       }
     })
 
@@ -178,6 +179,7 @@ describe('useApiClient', () => {
         expect(error).toBeInstanceOf(ApiError)
         expect((error as ApiError).statusCode).toBe(500)
         expect((error as ApiError).message).toBe('An unknown error occurred')
+        expect((error as ApiError).code).toBeUndefined()
       }
     })
 
@@ -194,7 +196,9 @@ describe('useApiClient', () => {
           expect(error).toBeInstanceOf(ApiError)
           expect((error as ApiError).statusCode).toBe(400)
           expect((error as ApiError).message).toBe('Title and content are required.')
+          expect((error as ApiError).code).toBe(400)
           expect((error as ApiError).response).toEqual({
+            code: 400,
             message: 'Title and content are required.'
           })
         }
@@ -212,7 +216,11 @@ describe('useApiClient', () => {
           expect(error).toBeInstanceOf(ApiError)
           expect((error as ApiError).statusCode).toBe(401)
           expect((error as ApiError).message).toBe('Invalid username or password.')
-          expect((error as ApiError).response).toEqual({ message: 'Invalid username or password.' })
+          expect((error as ApiError).code).toBe(401)
+          expect((error as ApiError).response).toEqual({
+            code: 401,
+            message: 'Invalid username or password.'
+          })
         }
       })
 
@@ -231,7 +239,9 @@ describe('useApiClient', () => {
           expect(error).toBeInstanceOf(ApiError)
           expect((error as ApiError).statusCode).toBe(403)
           expect((error as ApiError).message).toBe('You are not authorized to create articles.')
+          expect((error as ApiError).code).toBe(403)
           expect((error as ApiError).response).toEqual({
+            code: 403,
             message: 'You are not authorized to create articles.'
           })
         }
@@ -249,7 +259,9 @@ describe('useApiClient', () => {
           expect(error).toBeInstanceOf(ApiError)
           expect((error as ApiError).statusCode).toBe(409)
           expect((error as ApiError).message).toBe('A post with this slug already exists.')
+          expect((error as ApiError).code).toBe(409)
           expect((error as ApiError).response).toEqual({
+            code: 409,
             message: 'A post with this slug already exists.'
           })
         }
@@ -272,7 +284,9 @@ describe('useApiClient', () => {
           expect((error as ApiError).message).toBe(
             'Request syntax correct but contains semantic errors.'
           )
+          expect((error as ApiError).code).toBe(422)
           expect((error as ApiError).response).toEqual({
+            code: 422,
             message: 'Request syntax correct but contains semantic errors.'
           })
         }
@@ -295,7 +309,9 @@ describe('useApiClient', () => {
           expect((error as ApiError).message).toBe(
             'Failed to create article due to a server issue.'
           )
+          expect((error as ApiError).code).toBe(500)
           expect((error as ApiError).response).toEqual({
+            code: 500,
             message: 'Failed to create article due to a server issue.'
           })
         }
@@ -305,7 +321,7 @@ describe('useApiClient', () => {
     describe('error structure edge cases', () => {
       it('should default to 500 when statusCode is missing', async () => {
         const mockError = createIncompleteError({
-          data: { message: 'Error without status code' }
+          data: { code: 400, message: 'Error without status code' }
         })
         mockFetchFn.mockRejectedValue(mockError)
 
@@ -317,7 +333,11 @@ describe('useApiClient', () => {
           expect(error).toBeInstanceOf(ApiError)
           expect((error as ApiError).statusCode).toBe(500)
           expect((error as ApiError).message).toBe('Error without status code')
-          expect((error as ApiError).response).toEqual({ message: 'Error without status code' })
+          expect((error as ApiError).code).toBe(400)
+          expect((error as ApiError).response).toEqual({
+            code: 400,
+            message: 'Error without status code'
+          })
         }
       })
 
@@ -335,14 +355,17 @@ describe('useApiClient', () => {
           expect(error).toBeInstanceOf(ApiError)
           expect((error as ApiError).statusCode).toBe(404)
           expect((error as ApiError).message).toBe('An unknown error occurred')
+          expect((error as ApiError).code).toBeUndefined()
           expect((error as ApiError).response).toBeUndefined()
         }
       })
 
       it('should default message when data.message is missing', async () => {
+        // Note: This tests a defensive case where backend violates the Swagger spec
+        // (code and message are both required per spec, but we handle missing message)
         const mockError = createIncompleteError({
           statusCode: 400,
-          data: {}
+          data: { code: 400 }
         })
         mockFetchFn.mockRejectedValue(mockError)
 
@@ -354,14 +377,15 @@ describe('useApiClient', () => {
           expect(error).toBeInstanceOf(ApiError)
           expect((error as ApiError).statusCode).toBe(400)
           expect((error as ApiError).message).toBe('An unknown error occurred')
-          expect((error as ApiError).response).toEqual({})
+          expect((error as ApiError).code).toBe(400)
+          expect((error as ApiError).response).toEqual({ code: 400 })
         }
       })
 
       it('should preserve empty string message', async () => {
         const mockError = createIncompleteError({
           statusCode: 400,
-          data: { message: '' }
+          data: { code: 400, message: '' }
         })
         mockFetchFn.mockRejectedValue(mockError)
 
@@ -373,7 +397,8 @@ describe('useApiClient', () => {
           expect(error).toBeInstanceOf(ApiError)
           expect((error as ApiError).statusCode).toBe(400)
           expect((error as ApiError).message).toBe('')
-          expect((error as ApiError).response).toEqual({ message: '' })
+          expect((error as ApiError).code).toBe(400)
+          expect((error as ApiError).response).toEqual({ code: 400, message: '' })
         }
       })
 
@@ -381,8 +406,8 @@ describe('useApiClient', () => {
         const mockError = createIncompleteError({
           statusCode: 400,
           data: {
+            code: 400,
             message: 'Validation failed',
-            code: 'ERR_VALIDATION',
             details: [
               { field: 'email', message: 'Invalid email format' },
               { field: 'password', message: 'Password too short' }
@@ -400,9 +425,10 @@ describe('useApiClient', () => {
           expect(error).toBeInstanceOf(ApiError)
           expect((error as ApiError).statusCode).toBe(400)
           expect((error as ApiError).message).toBe('Validation failed')
+          expect((error as ApiError).code).toBe(400)
           expect((error as ApiError).response).toEqual({
+            code: 400,
             message: 'Validation failed',
-            code: 'ERR_VALIDATION',
             details: [
               { field: 'email', message: 'Invalid email format' },
               { field: 'password', message: 'Password too short' }

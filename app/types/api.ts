@@ -45,6 +45,7 @@ export interface LoginResponse {
   user: User
 }
 
-export interface ApiError {
+export interface ErrorResponse {
+  code: number
   message: string
 }
