@@ -1,8 +1,5 @@
-export interface User {
-  id: number
+export interface LoginUser {
   username: string
-  created_at: string
-  updated_at: string
 }
 
 export interface AuthorInfo {
@@ -24,7 +21,7 @@ export interface Article {
 export interface NewArticle {
   title: string
   content: string
-  slug?: string
+  slug: string
   published_at?: string | null
 }
 
@@ -42,7 +39,7 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   token: string
-  user: User
+  user: LoginUser
 }
 
 export interface ErrorResponse {
