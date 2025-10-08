@@ -39,6 +39,13 @@ describe('useArticle', () => {
     vi.mocked(useApiClient).mockReturnValue(
       mockApiClient as unknown as ReturnType<typeof useApiClient>
     )
+
+    // Reset useState state
+    const { articles, currentArticle, loading, error } = useArticle()
+    articles.value = []
+    currentArticle.value = null
+    loading.value = false
+    error.value = null
   })
 
   describe('list', () => {

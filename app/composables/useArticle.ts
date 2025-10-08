@@ -1,12 +1,12 @@
-import { ref } from 'vue'
+import { useState } from '#app'
 import type { Article, NewArticle, UpdateArticle } from '@/types/api'
 import { useApiClient } from './useApiClient'
 
 export function useArticle() {
-  const articles = ref<Article[]>([])
-  const currentArticle = ref<Article | null>(null)
-  const loading = ref(false)
-  const error = ref<Error | null>(null)
+  const articles = useState<Article[]>('articles', () => [])
+  const currentArticle = useState<Article | null>('currentArticle', () => null)
+  const loading = useState<boolean>('articles:loading', () => false)
+  const error = useState<Error | null>('articles:error', () => null)
 
   // Get API client with automatic token injection
   const apiClient = useApiClient()
