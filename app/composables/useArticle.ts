@@ -49,7 +49,7 @@ export function useArticle() {
 
     try {
       const result = await apiClient.post<Article>('/articles', article)
-      // 自動更新文章列表
+      // Automatically update articles list
       articles.value = [result, ...articles.value]
       return result
     } catch (e) {
@@ -66,12 +66,12 @@ export function useArticle() {
 
     try {
       const result = await apiClient.put<Article>(`/articles/${slug}`, article)
-      // 更新列表中的文章
+      // Update article in list
       const index = articles.value.findIndex((a) => a.slug === slug)
       if (index !== -1) {
         articles.value[index] = result
       }
-      // 更新當前文章
+      // Update current article
       if (currentArticle.value?.slug === slug) {
         currentArticle.value = result
       }
@@ -90,9 +90,9 @@ export function useArticle() {
 
     try {
       await apiClient.delete(`/articles/${slug}`)
-      // 從列表中移除
+      // Remove from list
       articles.value = articles.value.filter((a) => a.slug !== slug)
-      // 清除當前文章
+      // Clear current article
       if (currentArticle.value?.slug === slug) {
         currentArticle.value = null
       }
