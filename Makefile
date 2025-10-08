@@ -5,12 +5,10 @@ format:
 	@npx prettier --write . >/dev/null 2>&1 || true
 
 lint:
-	@npx eslint . --quiet
-	@npx nuxt typecheck --logLevel=silent
+	@(npx eslint . --quiet) & (npx nuxt typecheck --logLevel=silent) & wait
 
 lint-verbose:
-	@npx eslint .
-	@npx nuxt typecheck
+	@(npx eslint .) & (npx nuxt typecheck) & wait
 
 test:
 	@npx vitest run --reporter=dot --silent
@@ -19,5 +17,5 @@ ci:
 	@echo "Running format..."
 	@$(MAKE) format || true
 	@echo "Running tests and lint in parallel..."
-	@($(MAKE) test || true) & ($(MAKE) lint-verbose || true) & wait
+	@$(MAKE) test & $(MAKE) lint-verbose & wait
 	@echo "CI pipeline completed."
