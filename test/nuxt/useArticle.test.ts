@@ -42,9 +42,8 @@ describe('useArticle', () => {
   })
 
   describe('list', () => {
-    it('should fetch articles with query params', async () => {
+    it('should fetch all articles', async () => {
       const mockArticles = createMockArticlesList(3)
-      const mockParams = { page: 1, limit: 10 }
 
       mockApiClient.get.mockResolvedValue(mockArticles)
 
@@ -52,29 +51,16 @@ describe('useArticle', () => {
 
       expect(loading.value).toBe(false)
 
-      const promise = list(mockParams)
+      const promise = list()
       expect(loading.value).toBe(true)
 
       const result = await promise
 
-      expect(mockApiClient.get).toHaveBeenCalledWith('/articles', mockParams)
+      expect(mockApiClient.get).toHaveBeenCalledWith('/articles')
       expect(articles.value).toEqual(mockArticles)
       expect(loading.value).toBe(false)
       expect(error.value).toBe(null)
       expect(result).toEqual(mockArticles)
-    })
-
-    it('should fetch articles without query params', async () => {
-      const mockArticles = createMockArticlesList(5)
-
-      mockApiClient.get.mockResolvedValue(mockArticles)
-
-      const { list, articles } = useArticle()
-
-      await list()
-
-      expect(mockApiClient.get).toHaveBeenCalledWith('/articles', undefined)
-      expect(articles.value).toEqual(mockArticles)
     })
 
     it('should handle list errors', async () => {

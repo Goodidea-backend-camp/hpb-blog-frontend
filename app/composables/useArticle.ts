@@ -11,12 +11,12 @@ export function useArticle() {
   // Get API client with automatic token injection
   const apiClient = useApiClient()
 
-  async function list(params?: Record<string, unknown>) {
+  async function list() {
     loading.value = true
     error.value = null
 
     try {
-      const result = await apiClient.get<Article[]>('/articles', params)
+      const result = await apiClient.get<Article[]>('/articles')
       articles.value = result
       return result
     } catch (e) {
