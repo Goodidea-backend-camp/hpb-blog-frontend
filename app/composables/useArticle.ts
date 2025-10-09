@@ -43,12 +43,12 @@ export function useArticle() {
     }
   }
 
-  async function create(article: NewArticle) {
+  async function create(newArticle: NewArticle) {
     loading.value = true
     error.value = null
 
     try {
-      const result = await apiClient.post<Article>('/articles', article)
+      const result = await apiClient.post<Article>('/articles', newArticle)
       // Automatically update articles list
       articles.value = [result, ...articles.value]
       return result
@@ -60,12 +60,12 @@ export function useArticle() {
     }
   }
 
-  async function update(slug: string, article: UpdateArticle) {
+  async function update(slug: string, updatedArticle: UpdateArticle) {
     loading.value = true
     error.value = null
 
     try {
-      const result = await apiClient.put<Article>(`/articles/${slug}`, article)
+      const result = await apiClient.put<Article>(`/articles/${slug}`, updatedArticle)
       // Update article in list
       const index = articles.value.findIndex((a) => a.slug === slug)
       if (index !== -1) {
