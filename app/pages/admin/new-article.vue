@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { definePageMeta } from '#imports'
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
+import * as z from 'zod'
+import { Loader2 } from 'lucide-vue-next'
 import Editor from '@tinymce/tinymce-vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Label } from '@/components/ui/label'
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { useArticle } from '@/composables/useArticle'
 import type { NewArticle } from '@/types/api'
 
@@ -18,15 +22,41 @@ definePageMeta({
 const router = useRouter()
 const { create, loading, error: apiError } = useArticle()
 
-// Form data
-const title = ref('')
-const slug = ref('')
-const content = ref('')
-const publishMode = ref<'immediate' | 'schedule'>('immediate')
-const scheduledDateTime = ref('')
+// Zod validation schema
+const formSchema = toTypedSchema(
+  z
+    .object({
+      title: z.string().min(1, 'Title is required').trim(),
+      slug: z.string().min(1, 'Slug is required').trim(),
+      content: z.string().min(1, 'Content is required').trim(),
+      publishMode: z.enum(['immediate', 'schedule']),
+      scheduledDateTime: z.string().optional()
+    })
+    .refine(
+      (data) => {
+        if (data.publishMode === 'schedule') {
+          return !!data.scheduledDateTime && data.scheduledDateTime.length > 0
+        }
+        return true
+      },
+      {
+        message: 'Scheduled date and time is required',
+        path: ['scheduledDateTime']
+      }
+    )
+)
 
-// Validation errors
-const validationErrors = ref<string[]>([])
+// Form setup
+const form = useForm({
+  validationSchema: formSchema,
+  initialValues: {
+    title: '',
+    slug: '',
+    content: '',
+    publishMode: 'immediate' as const,
+    scheduledDateTime: ''
+  }
+})
 
 // TinyMCE configuration
 const tinymceConfig = {
@@ -57,40 +87,18 @@ const tinymceConfig = {
   content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
 }
 
+// Track publishMode for conditional rendering
+const currentPublishMode = ref<'immediate' | 'schedule'>('immediate')
+
 // Computed
-const isScheduleMode = computed(() => publishMode.value === 'schedule')
-
-// Validation
-const validateForm = (): boolean => {
-  validationErrors.value = []
-
-  if (!title.value.trim()) {
-    validationErrors.value.push('Title is required')
-  }
-
-  if (!slug.value.trim()) {
-    validationErrors.value.push('Slug is required')
-  }
-
-  if (!content.value.trim()) {
-    validationErrors.value.push('Content is required')
-  }
-
-  if (publishMode.value === 'schedule' && !scheduledDateTime.value) {
-    validationErrors.value.push('Scheduled date and time is required')
-  }
-
-  return validationErrors.value.length === 0
-}
+const isScheduleMode = computed(() => currentPublishMode.value === 'schedule')
 
 // Submit handlers
-const handleSaveAsDraft = async () => {
-  if (!validateForm()) return
-
+const handleSaveAsDraft = form.handleSubmit(async (values) => {
   const article: NewArticle = {
-    title: title.value,
-    slug: slug.value,
-    content: content.value,
+    title: values.title,
+    slug: values.slug,
+    content: values.content,
     published_at: null
   }
 
@@ -102,23 +110,21 @@ const handleSaveAsDraft = async () => {
   } else if (apiError.value) {
     alert(`Error: ${apiError.value.message}`)
   }
-}
+})
 
-const handlePublish = async () => {
-  if (!validateForm()) return
-
+const handlePublish = form.handleSubmit(async (values) => {
   let publishedAt: string
 
-  if (publishMode.value === 'immediate') {
+  if (values.publishMode === 'immediate') {
     publishedAt = new Date().toISOString()
   } else {
-    publishedAt = new Date(scheduledDateTime.value).toISOString()
+    publishedAt = new Date(values.scheduledDateTime!).toISOString()
   }
 
   const article: NewArticle = {
-    title: title.value,
-    slug: slug.value,
-    content: content.value,
+    title: values.title,
+    slug: values.slug,
+    content: values.content,
     published_at: publishedAt
   }
 
@@ -130,7 +136,7 @@ const handlePublish = async () => {
   } else if (apiError.value) {
     alert(`Error: ${apiError.value.message}`)
   }
-}
+})
 </script>
 
 <template>
@@ -140,115 +146,99 @@ const handlePublish = async () => {
       <p class="text-muted-foreground mt-2">Create a new blog article</p>
     </div>
 
-    <!-- Validation Errors -->
-    <Alert v-if="validationErrors.length > 0" variant="destructive" class="mb-6">
-      <AlertTitle>Validation Error</AlertTitle>
-      <AlertDescription>
-        <ul class="list-disc pl-4">
-          <li v-for="(err, index) in validationErrors" :key="index">{{ err }}</li>
-        </ul>
-      </AlertDescription>
-    </Alert>
-
     <!-- Form -->
-    <div class="space-y-6">
+    <form class="space-y-6">
       <!-- Title -->
-      <div class="space-y-2">
-        <Label for="title">Title *</Label>
-        <Input id="title" v-model="title" placeholder="Enter article title" :disabled="loading" />
-      </div>
+      <FormField v-slot="{ componentField }" name="title">
+        <FormItem>
+          <FormLabel>Title *</FormLabel>
+          <FormControl>
+            <Input v-bind="componentField" placeholder="Enter article title" :disabled="loading" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
 
       <!-- Slug -->
-      <div class="space-y-2">
-        <Label for="slug">Slug *</Label>
-        <Input id="slug" v-model="slug" placeholder="enter-article-slug" :disabled="loading" />
-      </div>
+      <FormField v-slot="{ componentField }" name="slug">
+        <FormItem>
+          <FormLabel>Slug *</FormLabel>
+          <FormControl>
+            <Input v-bind="componentField" placeholder="enter-article-slug" :disabled="loading" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
 
       <!-- Content -->
-      <div class="space-y-2">
-        <Label for="content">Content *</Label>
-        <Editor id="content" v-model="content" :init="tinymceConfig" :disabled="loading" />
-      </div>
+      <FormField v-slot="{ value, handleChange }" name="content">
+        <FormItem>
+          <FormLabel>Content *</FormLabel>
+          <FormControl>
+            <Editor
+              :model-value="value"
+              :init="tinymceConfig"
+              :disabled="loading"
+              @update:model-value="handleChange"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
 
       <!-- Publish Options -->
-      <div class="space-y-4">
-        <Label>Publish Options</Label>
-        <RadioGroup v-model="publishMode" :disabled="loading">
-          <div class="flex items-center space-x-2">
-            <RadioGroupItem id="immediate" value="immediate" />
-            <Label for="immediate" class="cursor-pointer font-normal"> Publish immediately </Label>
-          </div>
-          <div class="flex items-center space-x-2">
-            <RadioGroupItem id="schedule" value="schedule" />
-            <Label for="schedule" class="cursor-pointer font-normal">Schedule for:</Label>
-          </div>
-        </RadioGroup>
+      <FormField v-slot="{ value, handleChange }" name="publishMode">
+        <FormItem>
+          <FormLabel>Publish Options</FormLabel>
+          <FormControl>
+            <RadioGroup
+              :model-value="value"
+              :disabled="loading"
+              @update:model-value="
+                (val) => {
+                  handleChange(val)
+                  currentPublishMode = val as 'immediate' | 'schedule'
+                }
+              "
+            >
+              <div class="flex items-center space-x-2">
+                <RadioGroupItem id="immediate" value="immediate" />
+                <Label for="immediate" class="cursor-pointer font-normal">
+                  Publish immediately
+                </Label>
+              </div>
+              <div class="flex items-center space-x-2">
+                <RadioGroupItem id="schedule" value="schedule" />
+                <Label for="schedule" class="cursor-pointer font-normal">Schedule for:</Label>
+              </div>
+            </RadioGroup>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
 
-        <!-- Scheduled DateTime Input -->
-        <div v-if="isScheduleMode" class="ml-6">
-          <Input
-            id="scheduled-datetime"
-            v-model="scheduledDateTime"
-            type="datetime-local"
-            :disabled="loading"
-          />
-        </div>
-      </div>
+      <!-- Scheduled DateTime Input -->
+      <FormField v-if="isScheduleMode" v-slot="{ componentField }" name="scheduledDateTime">
+        <FormItem class="ml-6">
+          <FormControl>
+            <Input v-bind="componentField" type="datetime-local" :disabled="loading" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
 
       <!-- Action Buttons -->
       <div class="flex gap-4 pt-4">
-        <Button variant="outline" :disabled="loading" @click="handleSaveAsDraft">
-          <span v-if="loading" class="mr-2">
-            <svg
-              class="h-4 w-4 animate-spin"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-          </span>
+        <Button variant="outline" type="button" :disabled="loading" @click="handleSaveAsDraft">
+          <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
           Save as Draft
         </Button>
 
-        <Button :disabled="loading" @click="handlePublish">
-          <span v-if="loading" class="mr-2">
-            <svg
-              class="h-4 w-4 animate-spin"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-          </span>
+        <Button type="button" :disabled="loading" @click="handlePublish">
+          <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
           Publish
         </Button>
       </div>
-    </div>
+    </form>
   </div>
 </template>
