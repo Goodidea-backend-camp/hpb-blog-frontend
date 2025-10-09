@@ -13,6 +13,9 @@ export default defineNuxtConfig({
   routeRules: {
     '/api/**': {
       proxy: `http://backend:${backendPort}/**`
+    },
+    '/admin/**': {
+      ssr: false
     }
   },
 
