@@ -16,13 +16,13 @@ This is a Nuxt.js 4 frontend application for the HPB Blog project. It's configur
 
 ### Code Quality
 
-- `make ci` - Run complete CI pipeline (format, test, and lint in parallel)
-- `make lint` - Run ESLint and TypeScript type checking
-- `make format` - Fix ESLint issues and format code with Prettier
+- `make ci-llm` - Run complete CI pipeline (format, test, and lint in parallel)
+- `make lint-llm` - Run ESLint and TypeScript type checking
+- `make fmt-llm` - Fix ESLint issues and format code with Prettier
 
 ### Testing
 
-- `make test` - Run Vitest tests
+- `make test-llm` - Run Vitest tests
 - Test files are located in `test/unit/`, `test/e2e/`, and `test/nuxt/` directories
 
 ## Architecture
@@ -64,7 +64,7 @@ This is a Nuxt.js 4 frontend application for the HPB Blog project. It's configur
 
 After writing code, run the CI pipeline to ensure code quality:
 
-- `make ci` - Run complete CI pipeline (format code, then run tests and linting in parallel)
+- `make ci-llm` - Run complete CI pipeline (format code, then run tests and linting in parallel)
 
 This command will automatically format your code and run both tests and type checking concurrently. All checks must pass before committing code.
 
