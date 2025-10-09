@@ -8,6 +8,7 @@ interface Props {
   publishMode: 'immediate' | 'schedule'
   scheduledDateTime?: string
   disabled?: boolean
+  error?: string
 }
 
 const props = defineProps<Props>()
@@ -37,7 +38,7 @@ const isScheduleMode = computed(() => props.publishMode === 'schedule')
       </div>
     </RadioGroup>
 
-    <div v-if="isScheduleMode" class="ml-6">
+    <div v-if="isScheduleMode" class="ml-6 space-y-2">
       <Input
         :model-value="scheduledDateTime"
         type="datetime-local"
@@ -46,6 +47,9 @@ const isScheduleMode = computed(() => props.publishMode === 'schedule')
           (val: string | number) => emit('update:scheduledDateTime', String(val))
         "
       />
+      <p v-if="error" class="text-destructive text-sm font-medium">
+        {{ error }}
+      </p>
     </div>
   </div>
 </template>

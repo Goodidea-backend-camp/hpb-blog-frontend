@@ -31,6 +31,7 @@ import 'tinymce/plugins/textpattern'
 
 import Editor from '@tinymce/tinymce-vue'
 import { marked } from 'marked'
+import type { Editor as TinyMCEEditor } from 'tinymce'
 
 interface Props {
   modelValue?: string
@@ -44,7 +45,7 @@ const emit = defineEmits<{
 }>()
 
 // TinyMCE configuration
-const tinymceConfig = {
+const editorConfig = {
   height: 500,
   menubar: true,
   plugins: [
@@ -95,11 +96,8 @@ const tinymceConfig = {
     { start: '---', replacement: '<hr/>' }
   ],
   // Setup function for paste event handling
-  setup: (editor: {
-    on: (event: string, handler: (e: ClipboardEvent) => void) => void
-    insertContent: (content: string) => void
-  }) => {
-    editor.on('paste', (e: ClipboardEvent) => {
+  setup: (editor: TinyMCEEditor) => {
+    editor.on('paste', (e) => {
       // Get pasted content
       const clipboardData = e.clipboardData
       if (!clipboardData) return
@@ -141,7 +139,7 @@ const tinymceConfig = {
 <template>
   <Editor
     :model-value="modelValue"
-    :init="tinymceConfig"
+    :init="editorConfig"
     :disabled="disabled"
     @update:model-value="(value: string) => emit('update:modelValue', value)"
   />

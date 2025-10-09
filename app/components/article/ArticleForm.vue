@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useForm } from 'vee-validate'
 import { Loader2 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
@@ -37,13 +37,8 @@ const form = useForm({
   }
 })
 
-// Track publishMode for conditional rendering
-const currentPublishMode = ref<'immediate' | 'schedule'>(
-  (props.initialValues?.publishMode as 'immediate' | 'schedule') || 'immediate'
-)
-
 // Computed
-const isScheduleMode = computed(() => currentPublishMode.value === 'schedule')
+const isScheduleMode = computed(() => form.values.publishMode === 'schedule')
 
 // Submit handlers
 const handleSaveAsDraft = form.handleSubmit((values) => {
@@ -95,37 +90,21 @@ const handlePublish = form.handleSubmit((values) => {
     </FormField>
 
     <!-- Publish Options -->
-    <div>
-      <FormField v-slot="{ value, handleChange }" name="publishMode">
-        <FormItem>
-          <FormLabel>Publish Options</FormLabel>
-          <FormControl>
-            <PublishOptions
-              :publish-mode="value"
-              :scheduled-date-time="form.values.scheduledDateTime"
-              :disabled="loading"
-              @update:publish-mode="
-                (val) => {
-                  handleChange(val)
-                  currentPublishMode = val
-                }
-              "
-              @update:scheduled-date-time="(val) => form.setFieldValue('scheduledDateTime', val)"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <FormField v-if="isScheduleMode" v-slot="{ componentField }" name="scheduledDateTime">
-        <FormItem>
-          <FormControl>
-            <input v-bind="componentField" type="hidden" />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-    </div>
+    <FormField v-slot="{ value, handleChange }" name="publishMode">
+      <FormItem>
+        <FormLabel>Publish Options</FormLabel>
+        <FormControl>
+          <PublishOptions
+            :publish-mode="value"
+            :scheduled-date-time="form.values.scheduledDateTime"
+            :disabled="loading"
+            :error="isScheduleMode ? form.errors.value.scheduledDateTime : undefined"
+            @update:publish-mode="handleChange"
+            @update:scheduled-date-time="(val) => form.setFieldValue('scheduledDateTime', val)"
+          />
+        </FormControl>
+      </FormItem>
+    </FormField>
 
     <!-- Action Buttons -->
     <div class="flex gap-4 pt-4">
