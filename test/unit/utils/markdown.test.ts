@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { htmlToMarkdown, markdownToHtml } from '@/utils/markdown'
+import { htmlToMarkdown, markdownToHtml, detectMarkdown } from '@/utils/markdown'
 
 describe('markdown utilities', () => {
   describe('htmlToMarkdown', () => {
@@ -602,6 +602,283 @@ const x = 1;
       expect(backToMarkdown).toContain('- Feature 1')
       expect(backToMarkdown).toContain('[Link](https://example.com)')
       expect(backToMarkdown).toContain('const x = 1;')
+    })
+  })
+
+  describe('detectMarkdown', () => {
+    describe('headers', () => {
+      it('should detect h1 markdown', () => {
+        expect(detectMarkdown('# Hello World')).toBe(true)
+      })
+
+      it('should detect h2 markdown', () => {
+        expect(detectMarkdown('## Subtitle')).toBe(true)
+      })
+
+      it('should detect h3 markdown', () => {
+        expect(detectMarkdown('### Section')).toBe(true)
+      })
+
+      it('should detect h4 markdown', () => {
+        expect(detectMarkdown('#### Subsection')).toBe(true)
+      })
+
+      it('should detect h5 markdown', () => {
+        expect(detectMarkdown('##### Minor heading')).toBe(true)
+      })
+
+      it('should detect h6 markdown', () => {
+        expect(detectMarkdown('###### Smallest heading')).toBe(true)
+      })
+
+      it('should detect headers in multiline text', () => {
+        const text = 'Some text\n## Header\nMore text'
+        expect(detectMarkdown(text)).toBe(true)
+      })
+
+      it('should not detect # without space as header', () => {
+        expect(detectMarkdown('#NoSpace')).toBe(false)
+      })
+    })
+
+    describe('text formatting', () => {
+      it('should detect bold markdown with **', () => {
+        expect(detectMarkdown('This is **bold** text')).toBe(true)
+      })
+
+      it('should detect bold markdown at start', () => {
+        expect(detectMarkdown('**Bold** at start')).toBe(true)
+      })
+
+      it('should detect bold markdown at end', () => {
+        expect(detectMarkdown('At end **bold**')).toBe(true)
+      })
+
+      it('should detect italic markdown with single *', () => {
+        expect(detectMarkdown('This is *italic* text')).toBe(true)
+      })
+
+      it('should detect italic markdown at start', () => {
+        expect(detectMarkdown('*Italic* at start')).toBe(true)
+      })
+
+      it('should detect italic markdown at end', () => {
+        expect(detectMarkdown('At end *italic*')).toBe(true)
+      })
+
+      it('should not detect single * as markdown', () => {
+        expect(detectMarkdown('This is * not markdown')).toBe(false)
+      })
+
+      it('should detect combined bold and italic', () => {
+        expect(detectMarkdown('This is **bold** and *italic*')).toBe(true)
+      })
+    })
+
+    describe('links', () => {
+      it('should detect markdown links', () => {
+        expect(detectMarkdown('[Link text](https://example.com)')).toBe(true)
+      })
+
+      it('should detect links in text', () => {
+        expect(detectMarkdown('Check out [this link](https://example.com) for more')).toBe(true)
+      })
+
+      it('should detect links without protocol', () => {
+        expect(detectMarkdown('[Link](/relative/path)')).toBe(true)
+      })
+
+      it('should detect empty links', () => {
+        expect(detectMarkdown('[text]()')).toBe(true)
+      })
+    })
+
+    describe('lists', () => {
+      it('should detect unordered list with dash', () => {
+        expect(detectMarkdown('- Item 1')).toBe(true)
+      })
+
+      it('should detect unordered list with asterisk', () => {
+        expect(detectMarkdown('* Item 1')).toBe(true)
+      })
+
+      it('should detect unordered list with plus', () => {
+        expect(detectMarkdown('+ Item 1')).toBe(true)
+      })
+
+      it('should detect multiline unordered list', () => {
+        const text = '- Item 1\n- Item 2\n- Item 3'
+        expect(detectMarkdown(text)).toBe(true)
+      })
+
+      it('should detect list in middle of text', () => {
+        const text = 'Some text\n- List item\nMore text'
+        expect(detectMarkdown(text)).toBe(true)
+      })
+
+      it('should not detect dash/asterisk/plus without space as list', () => {
+        expect(detectMarkdown('-NoSpace')).toBe(false)
+        expect(detectMarkdown('*NoSpace')).toBe(false)
+        expect(detectMarkdown('+NoSpace')).toBe(false)
+      })
+    })
+
+    describe('blockquotes', () => {
+      it('should detect blockquote', () => {
+        expect(detectMarkdown('> This is a quote')).toBe(true)
+      })
+
+      it('should detect multiline blockquote', () => {
+        const text = '> Line 1\n> Line 2'
+        expect(detectMarkdown(text)).toBe(true)
+      })
+
+      it('should detect blockquote in middle of text', () => {
+        const text = 'Some text\n> Quote\nMore text'
+        expect(detectMarkdown(text)).toBe(true)
+      })
+
+      it('should not detect > without space as blockquote', () => {
+        expect(detectMarkdown('>NoSpace')).toBe(false)
+      })
+    })
+
+    describe('code blocks', () => {
+      it('should detect fenced code block', () => {
+        expect(detectMarkdown('```\ncode here\n```')).toBe(true)
+      })
+
+      it('should detect code block with language', () => {
+        expect(detectMarkdown('```javascript\nconst x = 1;\n```')).toBe(true)
+      })
+
+      it('should detect opening code fence only', () => {
+        expect(detectMarkdown('```')).toBe(true)
+      })
+
+      it('should detect code block in text', () => {
+        const text = 'Here is some code:\n```\ncode\n```\nEnd'
+        expect(detectMarkdown(text)).toBe(true)
+      })
+    })
+
+    describe('combined markdown', () => {
+      it('should detect complex markdown document', () => {
+        const text = `
+# Title
+
+This is a paragraph with **bold** and *italic*.
+
+- Item 1
+- Item 2
+
+[Link](https://example.com)
+        `
+        expect(detectMarkdown(text)).toBe(true)
+      })
+
+      it('should detect markdown with multiple features', () => {
+        const text = '## Header\n\n> Quote with **bold**\n\n- List item'
+        expect(detectMarkdown(text)).toBe(true)
+      })
+    })
+
+    describe('plain text (negative cases)', () => {
+      it('should return false for plain text', () => {
+        expect(detectMarkdown('Just plain text')).toBe(false)
+      })
+
+      it('should return false for plain text with numbers', () => {
+        expect(detectMarkdown('Text with 123 numbers')).toBe(false)
+      })
+
+      it('should return false for plain text with punctuation', () => {
+        expect(detectMarkdown('Text with punctuation! And more?')).toBe(false)
+      })
+
+      it('should return false for text with regular brackets', () => {
+        expect(detectMarkdown('Text with [brackets] but no link')).toBe(false)
+      })
+
+      it('should return false for text with regular parens', () => {
+        expect(detectMarkdown('Text with (parentheses) but no link')).toBe(false)
+      })
+
+      it('should return false for dash in middle of word', () => {
+        expect(detectMarkdown('Some-hyphenated-words')).toBe(false)
+      })
+
+      it('should return false for greater than in text', () => {
+        expect(detectMarkdown('5 > 3 is true')).toBe(false)
+      })
+    })
+
+    describe('edge cases', () => {
+      it('should return false for empty string', () => {
+        expect(detectMarkdown('')).toBe(false)
+      })
+
+      it('should return false for whitespace-only string', () => {
+        expect(detectMarkdown('   ')).toBe(false)
+        expect(detectMarkdown('\n\n')).toBe(false)
+        expect(detectMarkdown('\t\t')).toBe(false)
+      })
+
+      it('should handle string with leading/trailing whitespace', () => {
+        expect(detectMarkdown('  # Header  ')).toBe(true)
+        expect(detectMarkdown('\n**bold**\n')).toBe(true)
+      })
+
+      it('should return false for non-string input (null)', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        expect(detectMarkdown(null as any)).toBe(false)
+      })
+
+      it('should return false for non-string input (undefined)', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        expect(detectMarkdown(undefined as any)).toBe(false)
+      })
+
+      it('should return false for non-string input (number)', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        expect(detectMarkdown(123 as any)).toBe(false)
+      })
+
+      it('should return false for non-string input (object)', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        expect(detectMarkdown({} as any)).toBe(false)
+      })
+
+      it('should return false for non-string input (array)', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        expect(detectMarkdown([] as any)).toBe(false)
+      })
+    })
+
+    describe('false positives prevention', () => {
+      it('should not detect math expressions as markdown', () => {
+        expect(detectMarkdown('Calculate: a + b * c')).toBe(false)
+      })
+
+      it('should not detect file paths as markdown', () => {
+        expect(detectMarkdown('C:\\Users\\Documents\\file.txt')).toBe(false)
+      })
+
+      it('should not detect email-like patterns as markdown', () => {
+        expect(detectMarkdown('user@example.com')).toBe(false)
+      })
+
+      it('should not detect plain sentences as markdown', () => {
+        expect(detectMarkdown('This is a normal sentence.')).toBe(false)
+      })
+
+      it('should not detect prices as markdown', () => {
+        expect(detectMarkdown('The price is $100')).toBe(false)
+      })
+
+      it('should detect actual markdown even with surrounding plain text', () => {
+        expect(detectMarkdown('Some normal text **bold text** more normal text')).toBe(true)
+      })
     })
   })
 })
