@@ -30,8 +30,8 @@ import 'tinymce/plugins/wordcount'
 import 'tinymce/plugins/textpattern'
 
 import Editor from '@tinymce/tinymce-vue'
-import { marked } from 'marked'
 import type { Editor as TinyMCEEditor } from 'tinymce'
+import { detectMarkdown, markdownToHtml } from '@/utils/markdown'
 
 interface Props {
   modelValue?: string
@@ -106,21 +106,12 @@ const editorConfig = {
       const pastedText = clipboardData.getData('text/plain')
       if (!pastedText || pastedText.trim().length === 0) return
 
-      // Check if it looks like markdown (heuristic check)
-      const hasMarkdownSyntax =
-        /^#{1,6}\s/.test(pastedText) || // Headers
-        /\*\*.*\*\*/.test(pastedText) || // Bold
-        /\*.*\*/.test(pastedText) || // Italic
-        /\[.*\]\(.*\)/.test(pastedText) || // Links
-        /^[-*+]\s/.test(pastedText) || // Lists
-        /^>\s/.test(pastedText) || // Blockquote
-        /```/.test(pastedText) // Code blocks
-
-      if (!hasMarkdownSyntax) return
+      // Use the detectMarkdown utility to check if it looks like markdown
+      if (!detectMarkdown(pastedText)) return
 
       try {
-        // Parse markdown to HTML
-        const html = marked.parse(pastedText, { async: false }) as string
+        // Use the markdownToHtml utility to convert markdown to HTML
+        const html = markdownToHtml(pastedText)
 
         // Prevent default paste
         e.preventDefault()
