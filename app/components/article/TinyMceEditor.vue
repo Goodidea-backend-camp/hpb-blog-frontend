@@ -10,28 +10,15 @@ import 'tinymce/icons/default'
 import 'tinymce/skins/ui/oxide/skin.css'
 
 // Import essential plugins
-import 'tinymce/plugins/advlist'
-import 'tinymce/plugins/autolink'
 import 'tinymce/plugins/lists'
 import 'tinymce/plugins/link'
-import 'tinymce/plugins/image'
-import 'tinymce/plugins/charmap'
-import 'tinymce/plugins/preview'
-import 'tinymce/plugins/anchor'
-import 'tinymce/plugins/searchreplace'
-import 'tinymce/plugins/visualblocks'
 import 'tinymce/plugins/code'
-import 'tinymce/plugins/fullscreen'
-import 'tinymce/plugins/insertdatetime'
-import 'tinymce/plugins/media'
 import 'tinymce/plugins/table'
 import 'tinymce/plugins/help'
-import 'tinymce/plugins/wordcount'
 import 'tinymce/plugins/textpattern'
+import 'tinymce/plugins/autolink'
 
 import Editor from '@tinymce/tinymce-vue'
-import type { Editor as TinyMCEEditor } from 'tinymce'
-import { detectMarkdown, markdownToHtml } from '@/utils/markdown'
 
 interface Props {
   modelValue?: string
@@ -47,32 +34,13 @@ const emit = defineEmits<{
 // TinyMCE configuration
 const editorConfig = {
   height: 500,
-  menubar: true,
-  plugins: [
-    'advlist',
-    'autolink',
-    'lists',
-    'link',
-    'image',
-    'charmap',
-    'preview',
-    'anchor',
-    'searchreplace',
-    'visualblocks',
-    'code',
-    'fullscreen',
-    'insertdatetime',
-    'media',
-    'table',
-    'help',
-    'wordcount',
-    'textpattern'
-  ],
+  menubar: false,
+  plugins: ['lists', 'link', 'code', 'table', 'help', 'textpattern', 'autolink'],
   toolbar:
-    'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-  content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-  content_css: false,
-  skin: false,
+    'undo redo | blocks | bold italic | link | bullist numlist | outdent indent | table | code | removeformat | help',
+  content_style:
+    'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Hiragino Sans GB", "Microsoft JhengHei", "Helvetica Neue", Arial, sans-serif; font-size: 14px }',
+
   // Text pattern for markdown-style shortcuts while typing
   textpattern_patterns: [
     // Inline formatting
@@ -94,36 +62,7 @@ const editorConfig = {
     { start: '- ', cmd: 'InsertUnorderedList' },
     { start: '> ', format: 'blockquote' },
     { start: '---', replacement: '<hr/>' }
-  ],
-  // Setup function for paste event handling
-  setup: (editor: TinyMCEEditor) => {
-    editor.on('paste', (e) => {
-      // Get pasted content
-      const clipboardData = e.clipboardData
-      if (!clipboardData) return
-
-      // Try to get plain text
-      const pastedText = clipboardData.getData('text/plain')
-      if (!pastedText || pastedText.trim().length === 0) return
-
-      // Use the detectMarkdown utility to check if it looks like markdown
-      if (!detectMarkdown(pastedText)) return
-
-      try {
-        // Use the markdownToHtml utility to convert markdown to HTML
-        const html = markdownToHtml(pastedText)
-
-        // Prevent default paste
-        e.preventDefault()
-
-        // Insert the converted HTML
-        editor.insertContent(html)
-      } catch (error) {
-        // If parsing fails, let default paste happen
-        console.error('Markdown parsing failed:', error)
-      }
-    })
-  }
+  ]
 }
 </script>
 
