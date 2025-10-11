@@ -6,7 +6,7 @@ import ArticleForm from '@/components/article/ArticleForm.vue'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { useArticle } from '@/composables/useArticle'
 import { buildNewArticlePayload } from '@/composables/useArticlePayload'
-import type { ArticleFormValues } from '@/types/form'
+import type { ArticleFormValues, ArticleAction } from '@/types/form'
 
 definePageMeta({
   layout: 'admin'
@@ -37,7 +37,7 @@ const showNotification = (variant: 'default' | 'destructive', title: string, mes
 
 // Submit handlers
 const handleSaveDraft = async (articleFormValues: ArticleFormValues) => {
-  const newArticlePayload = buildNewArticlePayload(articleFormValues, true)
+  const newArticlePayload = buildNewArticlePayload(articleFormValues, 'save-draft')
   const result = await create(newArticlePayload)
 
   if (result) {
@@ -49,7 +49,10 @@ const handleSaveDraft = async (articleFormValues: ArticleFormValues) => {
 }
 
 const handlePublish = async (articleFormValues: ArticleFormValues) => {
-  const newArticlePayload = buildNewArticlePayload(articleFormValues, false)
+  const action: ArticleAction =
+    articleFormValues.publishMode === 'immediate' ? 'publish-immediate' : 'publish-scheduled'
+
+  const newArticlePayload = buildNewArticlePayload(articleFormValues, action)
   const result = await create(newArticlePayload)
 
   if (result) {

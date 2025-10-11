@@ -5,3 +5,5 @@ export interface ArticleFormValues {
   publishMode: 'immediate' | 'schedule'
   scheduledDateTime?: string
 }
+
+export type ArticleAction = 'save-draft' | 'publish-immediate' | 'publish-scheduled'
