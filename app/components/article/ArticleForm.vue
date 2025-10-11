@@ -8,7 +8,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import TinyMceEditor from './TinyMceEditor.vue'
 import PublishOptions from './PublishOptions.vue'
 import { articleFormSchema } from '@/composables/useArticleForm'
-import type { ArticleFormValues } from '@/composables/useArticleForm'
+import type { ArticleFormValues } from '@/types/form'
 
 interface Props {
   initialValues?: Partial<ArticleFormValues>
@@ -21,12 +21,12 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-  saveDraft: [values: ArticleFormValues]
-  publish: [values: ArticleFormValues]
+  saveDraft: [articleFormValues: ArticleFormValues]
+  publish: [articleFormValues: ArticleFormValues]
 }>()
 
 // Form setup
-const form = useForm({
+const articleForm = useForm({
   validationSchema: articleFormSchema,
   initialValues: {
     title: props.initialValues?.title || '',
@@ -38,15 +38,15 @@ const form = useForm({
 })
 
 // Computed
-const isScheduleMode = computed(() => form.values.publishMode === 'schedule')
+const isScheduleMode = computed(() => articleForm.values.publishMode === 'schedule')
 
 // Submit handlers
-const handleSaveAsDraft = form.handleSubmit((values) => {
-  emit('saveDraft', values)
+const handleSaveDraft = articleForm.handleSubmit((articleFormValues) => {
+  emit('saveDraft', articleFormValues)
 })
 
-const handlePublish = form.handleSubmit((values) => {
-  emit('publish', values)
+const handlePublish = articleForm.handleSubmit((articleFormValues) => {
+  emit('publish', articleFormValues)
 })
 </script>
 
@@ -96,11 +96,13 @@ const handlePublish = form.handleSubmit((values) => {
         <FormControl>
           <PublishOptions
             :publish-mode="value"
-            :scheduled-date-time="form.values.scheduledDateTime"
+            :scheduled-date-time="articleForm.values.scheduledDateTime"
             :disabled="loading"
-            :error="isScheduleMode ? form.errors.value.scheduledDateTime : undefined"
+            :error="isScheduleMode ? articleForm.errors.value.scheduledDateTime : undefined"
             @update:publish-mode="handleChange"
-            @update:scheduled-date-time="(val) => form.setFieldValue('scheduledDateTime', val)"
+            @update:scheduled-date-time="
+              (val) => articleForm.setFieldValue('scheduledDateTime', val)
+            "
           />
         </FormControl>
       </FormItem>
@@ -108,9 +110,9 @@ const handlePublish = form.handleSubmit((values) => {
 
     <!-- Action Buttons -->
     <div class="flex gap-4 pt-4">
-      <Button variant="outline" type="button" :disabled="loading" @click="handleSaveAsDraft">
+      <Button variant="outline" type="button" :disabled="loading" @click="handleSaveDraft">
         <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
-        Save as Draft
+        Save Draft
       </Button>
 
       <Button type="button" :disabled="loading" @click="handlePublish">

@@ -1,15 +1,7 @@
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import type { NewArticle, UpdateArticle } from '@/types/api'
-
-// Form values type
-export interface ArticleFormValues {
-  title: string
-  slug: string
-  content: string
-  publishMode: 'immediate' | 'schedule'
-  scheduledDateTime?: string
-}
+import type { ArticleFormValues } from '@/types/form'
 
 // Zod validation schema
 export const articleFormSchema = toTypedSchema(
@@ -36,41 +28,44 @@ export const articleFormSchema = toTypedSchema(
 )
 
 // Build article payload for create
-export function buildNewArticlePayload(values: ArticleFormValues, isDraft: boolean): NewArticle {
+export function buildNewArticlePayload(
+  articleFormValues: ArticleFormValues,
+  isDraft: boolean
+): NewArticle {
   let publishedAt: string | null = null
 
   if (!isDraft) {
-    if (values.publishMode === 'immediate') {
+    if (articleFormValues.publishMode === 'immediate') {
       publishedAt = new Date().toISOString()
     } else {
-      publishedAt = new Date(values.scheduledDateTime!).toISOString()
+      publishedAt = new Date(articleFormValues.scheduledDateTime!).toISOString()
     }
   }
 
   return {
-    title: values.title,
-    slug: values.slug,
-    content: values.content,
+    title: articleFormValues.title,
+    slug: articleFormValues.slug,
+    content: articleFormValues.content,
     published_at: publishedAt
   }
 }
 
 // Build article payload for update
 export function buildUpdateArticlePayload(
-  values: Partial<ArticleFormValues>,
+  articleFormValues: Partial<ArticleFormValues>,
   isDraft: boolean
 ): UpdateArticle {
   const payload: UpdateArticle = {}
 
-  if (values.title !== undefined) payload.title = values.title
-  if (values.slug !== undefined) payload.slug = values.slug
-  if (values.content !== undefined) payload.content = values.content
+  if (articleFormValues.title !== undefined) payload.title = articleFormValues.title
+  if (articleFormValues.slug !== undefined) payload.slug = articleFormValues.slug
+  if (articleFormValues.content !== undefined) payload.content = articleFormValues.content
 
-  if (!isDraft && values.publishMode) {
-    if (values.publishMode === 'immediate') {
+  if (!isDraft && articleFormValues.publishMode) {
+    if (articleFormValues.publishMode === 'immediate') {
       payload.published_at = new Date().toISOString()
-    } else if (values.scheduledDateTime) {
-      payload.published_at = new Date(values.scheduledDateTime).toISOString()
+    } else if (articleFormValues.scheduledDateTime) {
+      payload.published_at = new Date(articleFormValues.scheduledDateTime).toISOString()
     }
   } else if (isDraft) {
     payload.published_at = null

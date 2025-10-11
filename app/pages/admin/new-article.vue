@@ -6,7 +6,7 @@ import ArticleForm from '@/components/article/ArticleForm.vue'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { useArticle } from '@/composables/useArticle'
 import { buildNewArticlePayload } from '@/composables/useArticleForm'
-import type { ArticleFormValues } from '@/composables/useArticleForm'
+import type { ArticleFormValues } from '@/types/form'
 
 definePageMeta({
   layout: 'admin'
@@ -36,8 +36,8 @@ const showNotification = (variant: 'default' | 'destructive', title: string, mes
 }
 
 // Submit handlers
-const handleSaveAsDraft = async (values: ArticleFormValues) => {
-  const article = buildNewArticlePayload(values, true)
+const handleSaveDraft = async (articleFormValues: ArticleFormValues) => {
+  const article = buildNewArticlePayload(articleFormValues, true)
   const result = await create(article)
 
   if (result) {
@@ -48,8 +48,8 @@ const handleSaveAsDraft = async (values: ArticleFormValues) => {
   }
 }
 
-const handlePublish = async (values: ArticleFormValues) => {
-  const article = buildNewArticlePayload(values, false)
+const handlePublish = async (articleFormValues: ArticleFormValues) => {
+  const article = buildNewArticlePayload(articleFormValues, false)
   const result = await create(article)
 
   if (result) {
@@ -73,6 +73,6 @@ const handlePublish = async (values: ArticleFormValues) => {
       <AlertDescription>{{ notification.message }}</AlertDescription>
     </Alert>
 
-    <ArticleForm :loading="loading" @save-draft="handleSaveAsDraft" @publish="handlePublish" />
+    <ArticleForm :loading="loading" @save-draft="handleSaveDraft" @publish="handlePublish" />
   </div>
 </template>
