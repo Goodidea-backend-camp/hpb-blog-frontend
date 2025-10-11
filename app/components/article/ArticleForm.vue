@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import TinyMceEditor from './TinyMceEditor.vue'
 import PublishOptions from './PublishOptions.vue'
-import { articleFormSchema } from '@/composables/useArticleForm'
+import { articleFormSchema } from '@/composables/useArticleValidation'
 import type { ArticleFormValues } from '@/types/form'
 
 interface Props {

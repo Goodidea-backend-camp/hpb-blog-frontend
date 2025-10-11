@@ -108,7 +108,7 @@ export interface ArticleFormValues {
 
 ---
 
-### 9. 建立 `app/composables/schemas/articleValidation.ts`
+### 9. 建立 `app/composables/useArticleValidation.ts`
 
 從 `useArticleForm.ts` 移動 zod schema:
 
@@ -125,14 +125,13 @@ export const articleFormSchema = toTypedSchema(
 
 ---
 
-### 10-12. 建立 `app/composables/transformers/articlePayload.ts`
+### 10-12. 建立 `app/composables/useArticlePayload.ts`
 
 #### 10. 移動 payload builders
 
 從 `useArticleForm.ts` 移動:
 
 - `buildNewArticlePayload()`
-- `buildUpdateArticlePayload()`
 
 #### 11. 加入 HTML→Markdown 轉換 (關鍵!)
 
@@ -164,9 +163,9 @@ export function buildNewArticlePayload(values: ArticleFormValues, isDraft: boole
 
 #### 12. 統一 draft/publish payload 建構邏輯
 
-重構 `buildNewArticlePayload` 和 `buildUpdateArticlePayload`,確保:
+重構 `buildNewArticlePayload` ,確保:
 
-- 兩者都正確轉換 content 為 Markdown
+- 正確轉換 content 為 Markdown
 - Draft 和 Publish 只差在 `published_at` 的值
 - 邏輯清晰易懂
 
@@ -178,8 +177,8 @@ export function buildNewArticlePayload(values: ArticleFormValues, isDraft: boole
 
 ```typescript
 // 只 re-export 需要的功能
-export { articleFormSchema } from './schemas/articleValidation'
-export { buildNewArticlePayload, buildUpdateArticlePayload } from './transformers/articlePayload'
+export { articleFormSchema } from './useArticleValidation'
+export { buildNewArticlePayload } from './useArticlePayload'
 export type { ArticleFormValues } from '@/types/form'
 ```
 
@@ -355,7 +354,7 @@ export default defineConfig({
 test('儲存草稿流程', async ({ page }) => {
   // 1. 前往新增文章頁面
   // 2. 填寫表單
-  // 3. 點擊 "Save as Draft"
+  // 3. 點擊 "Save Draft"
   // 4. 攔截 API request
   // 5. 驗證 request body:
   //    - content 是 Markdown 格式
@@ -419,6 +418,3 @@ test('排程發布流程', async ({ page }) => {
 
 - PublishOptions UX 暫時維持現狀,待與團隊討論後再調整
 - Playwright 已確認作為 E2E 測試工具
-- TinyMCE 的 `textpattern` 和 `paste` event 功能互補,不是重複:
-  - `textpattern`: 即時 shortcuts (打字時轉換)
-  - `paste`: 偵測整塊 Markdown 並轉換

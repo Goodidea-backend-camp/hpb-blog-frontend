@@ -5,7 +5,7 @@ import { definePageMeta } from '#imports'
 import ArticleForm from '@/components/article/ArticleForm.vue'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { useArticle } from '@/composables/useArticle'
-import { buildNewArticlePayload } from '@/composables/useArticleForm'
+import { buildNewArticlePayload } from '@/composables/useArticlePayload'
 import type { ArticleFormValues } from '@/types/form'
 
 definePageMeta({
@@ -37,8 +37,8 @@ const showNotification = (variant: 'default' | 'destructive', title: string, mes
 
 // Submit handlers
 const handleSaveDraft = async (articleFormValues: ArticleFormValues) => {
-  const article = buildNewArticlePayload(articleFormValues, true)
-  const result = await create(article)
+  const newArticlePayload = buildNewArticlePayload(articleFormValues, true)
+  const result = await create(newArticlePayload)
 
   if (result) {
     showNotification('default', 'Success', 'Draft saved successfully')
@@ -49,8 +49,8 @@ const handleSaveDraft = async (articleFormValues: ArticleFormValues) => {
 }
 
 const handlePublish = async (articleFormValues: ArticleFormValues) => {
-  const article = buildNewArticlePayload(articleFormValues, false)
-  const result = await create(article)
+  const newArticlePayload = buildNewArticlePayload(articleFormValues, false)
+  const result = await create(newArticlePayload)
 
   if (result) {
     showNotification('default', 'Success', 'Article published successfully')
