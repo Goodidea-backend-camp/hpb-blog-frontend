@@ -21,8 +21,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-  saveDraft: [articleFormValues: ArticleFormValues]
-  publish: [articleFormValues: ArticleFormValues]
+  submit: [articleFormValues: ArticleFormValues]
 }>()
 
 // Form setup
@@ -38,34 +37,24 @@ const articleForm = useForm({
 })
 
 // Computed
-const isScheduledMode = computed(() => articleForm.values.publishSetting === 'publish-scheduled')
+const isScheduledPublish = computed(() => articleForm.values.publishSetting === 'publish-scheduled')
 
-const publishButtonText = computed(() => {
+const submitButtonText = computed(() => {
   switch (articleForm.values.publishSetting) {
     case 'publish-immediate':
       return 'Publish Now'
     case 'publish-scheduled':
       return 'Schedule Publish'
     case 'save-draft':
-      return 'Publish'
+      return 'Save Draft'
     default:
-      return 'Publish'
+      return 'Submit'
   }
 })
 
-const isPublishDisabled = computed(() => {
-  return articleForm.values.publishSetting === 'save-draft'
-})
-
-// Submit handlers
-const handleSaveDraft = articleForm.handleSubmit((articleFormValues) => {
-  // Override publishSetting to save-draft
-  const draftValues = { ...articleFormValues, publishSetting: 'save-draft' as const }
-  emit('saveDraft', draftValues)
-})
-
-const handlePublish = articleForm.handleSubmit((articleFormValues) => {
-  emit('publish', articleFormValues)
+// Submit handler
+const handleSubmit = articleForm.handleSubmit((articleFormValues) => {
+  emit('submit', articleFormValues)
 })
 </script>
 
@@ -117,7 +106,7 @@ const handlePublish = articleForm.handleSubmit((articleFormValues) => {
             :publish-setting="value"
             :scheduled-date-time="articleForm.values.scheduledDateTime"
             :disabled="loading"
-            :error="isScheduledMode ? articleForm.errors.value.scheduledDateTime : undefined"
+            :error="isScheduledPublish ? articleForm.errors.value.scheduledDateTime : undefined"
             @update:publish-setting="handleChange"
             @update:scheduled-date-time="
               (val) => articleForm.setFieldValue('scheduledDateTime', val)
@@ -127,27 +116,11 @@ const handlePublish = articleForm.handleSubmit((articleFormValues) => {
       </FormItem>
     </FormField>
 
-    <!-- Action Buttons -->
+    <!-- Action Button -->
     <div class="flex gap-4 pt-4">
-      <Button
-        variant="outline"
-        type="button"
-        class="cursor-pointer"
-        :disabled="loading"
-        @click="handleSaveDraft"
-      >
+      <Button type="button" class="cursor-pointer" :disabled="loading" @click="handleSubmit">
         <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
-        Save Draft
-      </Button>
-
-      <Button
-        type="button"
-        class="cursor-pointer"
-        :disabled="loading || isPublishDisabled"
-        @click="handlePublish"
-      >
-        <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
-        {{ publishButtonText }}
+        {{ submitButtonText }}
       </Button>
     </div>
   </form>

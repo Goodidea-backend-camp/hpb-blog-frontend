@@ -19,7 +19,7 @@ const emit = defineEmits<{
   'update:scheduledDateTime': [value: string]
 }>()
 
-const isScheduledMode = computed(() => props.publishSetting === 'publish-scheduled')
+const isScheduledPublish = computed(() => props.publishSetting === 'publish-scheduled')
 </script>
 
 <template>
@@ -40,7 +40,7 @@ const isScheduledMode = computed(() => props.publishSetting === 'publish-schedul
         <Label for="publish-scheduled" class="cursor-pointer"> Schedule publish </Label>
       </div>
 
-      <div v-if="isScheduledMode" class="space-y-2">
+      <div v-if="isScheduledPublish" class="space-y-2">
         <Input
           :model-value="scheduledDateTime"
           type="datetime-local"

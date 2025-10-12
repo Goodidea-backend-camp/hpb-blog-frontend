@@ -35,32 +35,30 @@ const showNotification = (variant: 'default' | 'destructive', title: string, mes
   }, 5000)
 }
 
-// Submit handlers
-const handleSaveDraft = async (articleFormValues: ArticleFormValues) => {
+// Submit handler
+const handleSubmit = async (articleFormValues: ArticleFormValues) => {
   const payload = buildNewArticlePayload(articleFormValues)
   const result = await create(payload)
 
   if (result) {
-    showNotification('default', 'Success', 'Draft saved successfully')
+    const message = getSuccessMessage(articleFormValues.publishSetting)
+    showNotification('default', 'Success', message)
     setTimeout(() => router.push('/admin'), 1500)
   } else if (createError.value) {
     showNotification('destructive', 'Error', createError.value.message)
   }
 }
 
-const handlePublish = async (articleFormValues: ArticleFormValues) => {
-  const payload = buildNewArticlePayload(articleFormValues)
-  const result = await create(payload)
-
-  if (result) {
-    const message =
-      articleFormValues.publishSetting === 'publish-immediate'
-        ? 'Article published successfully'
-        : 'Article scheduled successfully'
-    showNotification('default', 'Success', message)
-    setTimeout(() => router.push('/admin'), 1500)
-  } else if (createError.value) {
-    showNotification('destructive', 'Error', createError.value.message)
+const getSuccessMessage = (publishSetting: ArticleFormValues['publishSetting']) => {
+  switch (publishSetting) {
+    case 'publish-immediate':
+      return 'Article published successfully'
+    case 'publish-scheduled':
+      return 'Article scheduled successfully'
+    case 'save-draft':
+      return 'Draft saved successfully'
+    default:
+      return 'Article saved successfully'
   }
 }
 </script>
@@ -77,6 +75,6 @@ const handlePublish = async (articleFormValues: ArticleFormValues) => {
       <AlertDescription>{{ notification.message }}</AlertDescription>
     </Alert>
 
-    <ArticleForm :loading="loading" @save-draft="handleSaveDraft" @publish="handlePublish" />
+    <ArticleForm :loading="loading" @submit="handleSubmit" />
   </div>
 </template>
