@@ -16,13 +16,14 @@ describe('useArticlePayload', () => {
       title: 'Test Article',
       slug: 'test-article',
       content: '<h1>Hello World</h1><p>This is <strong>bold</strong> text.</p>',
-      publishMode: 'immediate',
+      publishSetting: 'publish-immediate',
       scheduledDateTime: undefined
     }
 
     describe('HTML to Markdown conversion', () => {
       it('should convert HTML content to Markdown format', () => {
-        const result = buildNewArticlePayload(baseFormValues, 'save-draft')
+        const draftValues = { ...baseFormValues, publishSetting: 'save-draft' as const }
+        const result = buildNewArticlePayload(draftValues)
 
         // Verify content is converted to Markdown
         expect(result.content).toContain('# Hello World')
@@ -35,6 +36,7 @@ describe('useArticlePayload', () => {
       it('should handle complex HTML structures', () => {
         const complexFormValues: ArticleFormValues = {
           ...baseFormValues,
+          publishSetting: 'save-draft',
           content: `
             <h2>Section</h2>
             <ul>
@@ -45,7 +47,7 @@ describe('useArticlePayload', () => {
           `
         }
 
-        const result = buildNewArticlePayload(complexFormValues, 'save-draft')
+        const result = buildNewArticlePayload(complexFormValues)
 
         expect(result.content).toContain('## Section')
         expect(result.content).toContain('- Item 1')
@@ -56,13 +58,15 @@ describe('useArticlePayload', () => {
 
     describe('draft mode', () => {
       it('should set published_at to null when saving as draft', () => {
-        const result = buildNewArticlePayload(baseFormValues, 'save-draft')
+        const draftValues = { ...baseFormValues, publishSetting: 'save-draft' as const }
+        const result = buildNewArticlePayload(draftValues)
 
         expect(result.published_at).toBeNull()
       })
 
       it('should include all required fields for draft', () => {
-        const result = buildNewArticlePayload(baseFormValues, 'save-draft')
+        const draftValues = { ...baseFormValues, publishSetting: 'save-draft' as const }
+        const result = buildNewArticlePayload(draftValues)
 
         expect(result.title).toBe('Test Article')
         expect(result.slug).toBe('test-article')
@@ -73,14 +77,16 @@ describe('useArticlePayload', () => {
 
     describe('immediate publish mode', () => {
       it('should set published_at to current time when publishing immediately', () => {
-        const result = buildNewArticlePayload(baseFormValues, 'publish-immediate')
+        const immediateValues = { ...baseFormValues, publishSetting: 'publish-immediate' as const }
+        const result = buildNewArticlePayload(immediateValues)
 
         expect(result.published_at).toBe(mockDate.toISOString())
         expect(result.published_at).toBe('2024-01-15T10:00:00.000Z')
       })
 
       it('should include all required fields for immediate publish', () => {
-        const result = buildNewArticlePayload(baseFormValues, 'publish-immediate')
+        const immediateValues = { ...baseFormValues, publishSetting: 'publish-immediate' as const }
+        const result = buildNewArticlePayload(immediateValues)
 
         expect(result.title).toBe('Test Article')
         expect(result.slug).toBe('test-article')
@@ -94,11 +100,11 @@ describe('useArticlePayload', () => {
         const scheduledTime = '2024-02-01T15:30:00.000Z'
         const scheduledFormValues: ArticleFormValues = {
           ...baseFormValues,
-          publishMode: 'schedule',
+          publishSetting: 'publish-scheduled',
           scheduledDateTime: scheduledTime
         }
 
-        const result = buildNewArticlePayload(scheduledFormValues, 'publish-scheduled')
+        const result = buildNewArticlePayload(scheduledFormValues)
 
         expect(result.published_at).toBe(new Date(scheduledTime).toISOString())
         expect(result.published_at).toBe('2024-02-01T15:30:00.000Z')
@@ -107,11 +113,11 @@ describe('useArticlePayload', () => {
       it('should ignore scheduled time when saving as draft', () => {
         const scheduledFormValues: ArticleFormValues = {
           ...baseFormValues,
-          publishMode: 'schedule',
+          publishSetting: 'save-draft',
           scheduledDateTime: '2024-02-01T15:30:00.000Z'
         }
 
-        const result = buildNewArticlePayload(scheduledFormValues, 'save-draft')
+        const result = buildNewArticlePayload(scheduledFormValues)
 
         expect(result.published_at).toBeNull()
       })
@@ -119,12 +125,12 @@ describe('useArticlePayload', () => {
       it('should throw error when scheduledDateTime is missing for publish-scheduled', () => {
         const scheduledFormValues: ArticleFormValues = {
           ...baseFormValues,
-          publishMode: 'schedule',
+          publishSetting: 'publish-scheduled',
           scheduledDateTime: undefined
         }
 
         expect(() => {
-          buildNewArticlePayload(scheduledFormValues, 'publish-scheduled')
+          buildNewArticlePayload(scheduledFormValues)
         }).toThrow('scheduledDateTime is required for publish-scheduled action')
       })
     })
@@ -133,10 +139,11 @@ describe('useArticlePayload', () => {
       it('should handle empty HTML content', () => {
         const emptyContentValues: ArticleFormValues = {
           ...baseFormValues,
+          publishSetting: 'save-draft',
           content: ''
         }
 
-        const result = buildNewArticlePayload(emptyContentValues, 'save-draft')
+        const result = buildNewArticlePayload(emptyContentValues)
 
         expect(result.content).toBe('')
       })
@@ -144,10 +151,11 @@ describe('useArticlePayload', () => {
       it('should handle plain text content (no HTML tags)', () => {
         const plainTextValues: ArticleFormValues = {
           ...baseFormValues,
+          publishSetting: 'save-draft',
           content: 'Plain text content'
         }
 
-        const result = buildNewArticlePayload(plainTextValues, 'save-draft')
+        const result = buildNewArticlePayload(plainTextValues)
 
         expect(result.content).toBe('Plain text content')
       })

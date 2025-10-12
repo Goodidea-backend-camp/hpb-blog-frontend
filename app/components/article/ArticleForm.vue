@@ -32,17 +32,36 @@ const articleForm = useForm({
     title: props.initialValues?.title || '',
     slug: props.initialValues?.slug || '',
     content: props.initialValues?.content || '',
-    publishMode: (props.initialValues?.publishMode || 'immediate') as 'immediate' | 'schedule',
+    publishSetting: props.initialValues?.publishSetting || 'publish-immediate',
     scheduledDateTime: props.initialValues?.scheduledDateTime || ''
   }
 })
 
 // Computed
-const isScheduleMode = computed(() => articleForm.values.publishMode === 'schedule')
+const isScheduledMode = computed(() => articleForm.values.publishSetting === 'publish-scheduled')
+
+const publishButtonText = computed(() => {
+  switch (articleForm.values.publishSetting) {
+    case 'publish-immediate':
+      return 'Publish Now'
+    case 'publish-scheduled':
+      return 'Schedule Publish'
+    case 'save-draft':
+      return 'Publish'
+    default:
+      return 'Publish'
+  }
+})
+
+const isPublishDisabled = computed(() => {
+  return articleForm.values.publishSetting === 'save-draft'
+})
 
 // Submit handlers
 const handleSaveDraft = articleForm.handleSubmit((articleFormValues) => {
-  emit('saveDraft', articleFormValues)
+  // Override publishSetting to save-draft
+  const draftValues = { ...articleFormValues, publishSetting: 'save-draft' as const }
+  emit('saveDraft', draftValues)
 })
 
 const handlePublish = articleForm.handleSubmit((articleFormValues) => {
@@ -89,17 +108,17 @@ const handlePublish = articleForm.handleSubmit((articleFormValues) => {
       </FormItem>
     </FormField>
 
-    <!-- Publish Options -->
-    <FormField v-slot="{ value, handleChange }" name="publishMode">
+    <!-- Publish Settings -->
+    <FormField v-slot="{ value, handleChange }" name="publishSetting">
       <FormItem>
-        <FormLabel>Publish Options</FormLabel>
+        <FormLabel>Publish Settings</FormLabel>
         <FormControl>
           <PublishOptions
-            :publish-mode="value"
+            :publish-setting="value"
             :scheduled-date-time="articleForm.values.scheduledDateTime"
             :disabled="loading"
-            :error="isScheduleMode ? articleForm.errors.value.scheduledDateTime : undefined"
-            @update:publish-mode="handleChange"
+            :error="isScheduledMode ? articleForm.errors.value.scheduledDateTime : undefined"
+            @update:publish-setting="handleChange"
             @update:scheduled-date-time="
               (val) => articleForm.setFieldValue('scheduledDateTime', val)
             "
@@ -110,14 +129,25 @@ const handlePublish = articleForm.handleSubmit((articleFormValues) => {
 
     <!-- Action Buttons -->
     <div class="flex gap-4 pt-4">
-      <Button variant="outline" type="button" :disabled="loading" @click="handleSaveDraft">
+      <Button
+        variant="outline"
+        type="button"
+        class="cursor-pointer"
+        :disabled="loading"
+        @click="handleSaveDraft"
+      >
         <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
         Save Draft
       </Button>
 
-      <Button type="button" :disabled="loading" @click="handlePublish">
+      <Button
+        type="button"
+        class="cursor-pointer"
+        :disabled="loading || isPublishDisabled"
+        @click="handlePublish"
+      >
         <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
-        Publish
+        {{ publishButtonText }}
       </Button>
     </div>
   </form>

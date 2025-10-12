@@ -6,7 +6,7 @@ import ArticleForm from '@/components/article/ArticleForm.vue'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { useArticle } from '@/composables/useArticle'
 import { buildNewArticlePayload } from '@/composables/useArticlePayload'
-import type { ArticleFormValues, ArticleAction } from '@/types/form'
+import type { ArticleFormValues } from '@/types/form'
 
 definePageMeta({
   layout: 'admin'
@@ -37,8 +37,8 @@ const showNotification = (variant: 'default' | 'destructive', title: string, mes
 
 // Submit handlers
 const handleSaveDraft = async (articleFormValues: ArticleFormValues) => {
-  const newArticlePayload = buildNewArticlePayload(articleFormValues, 'save-draft')
-  const result = await create(newArticlePayload)
+  const payload = buildNewArticlePayload(articleFormValues)
+  const result = await create(payload)
 
   if (result) {
     showNotification('default', 'Success', 'Draft saved successfully')
@@ -49,14 +49,15 @@ const handleSaveDraft = async (articleFormValues: ArticleFormValues) => {
 }
 
 const handlePublish = async (articleFormValues: ArticleFormValues) => {
-  const action: ArticleAction =
-    articleFormValues.publishMode === 'immediate' ? 'publish-immediate' : 'publish-scheduled'
-
-  const newArticlePayload = buildNewArticlePayload(articleFormValues, action)
-  const result = await create(newArticlePayload)
+  const payload = buildNewArticlePayload(articleFormValues)
+  const result = await create(payload)
 
   if (result) {
-    showNotification('default', 'Success', 'Article published successfully')
+    const message =
+      articleFormValues.publishSetting === 'publish-immediate'
+        ? 'Article published successfully'
+        : 'Article scheduled successfully'
+    showNotification('default', 'Success', message)
     setTimeout(() => router.push('/admin'), 1500)
   } else if (createError.value) {
     showNotification('destructive', 'Error', createError.value.message)

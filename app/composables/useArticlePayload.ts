@@ -6,18 +6,17 @@ import type { ArticleFormValues, ArticleAction } from '@/types/form'
  * Build article payload for creating a new article
  *
  * Converts HTML content to Markdown before sending to backend.
- * Handles draft, immediate publish, and scheduled publish scenarios.
+ * Handles draft, immediate publish, and scheduled publish scenarios based on form's publishSetting.
  *
- * @param articleFormValues - Form values from the article form
- * @param action - Action type: 'save-draft', 'publish-immediate', or 'publish-scheduled'
+ * @param articleFormValues - Form values from the article form (includes publishSetting)
  * @returns NewArticle payload ready for API submission
  */
-export function buildNewArticlePayload(
-  articleFormValues: ArticleFormValues,
-  action: ArticleAction
-): NewArticle {
+export function buildNewArticlePayload(articleFormValues: ArticleFormValues): NewArticle {
   const markdownContent = htmlToMarkdown(articleFormValues.content)
-  const publishedAt = getPublishedAt(action, articleFormValues.scheduledDateTime)
+  const publishedAt = getPublishedAt(
+    articleFormValues.publishSetting,
+    articleFormValues.scheduledDateTime
+  )
 
   return {
     title: articleFormValues.title,
