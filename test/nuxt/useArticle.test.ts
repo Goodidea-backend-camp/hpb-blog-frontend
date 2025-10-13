@@ -41,11 +41,10 @@ describe('useArticle', () => {
     )
 
     // Reset useState state
-    const { articles, currentArticle, loading, error } = useArticle()
+    const { articles, currentArticle, loading } = useArticle()
     articles.value = []
     currentArticle.value = null
     loading.value = false
-    error.value = null
   })
 
   describe('list', () => {
@@ -54,7 +53,7 @@ describe('useArticle', () => {
 
       mockApiClient.get.mockResolvedValue(mockArticles)
 
-      const { list, articles, loading, error } = useArticle()
+      const { list, articles, loading } = useArticle()
 
       expect(loading.value).toBe(false)
 
@@ -66,7 +65,6 @@ describe('useArticle', () => {
       expect(mockApiClient.get).toHaveBeenCalledWith('/articles')
       expect(articles.value).toEqual(mockArticles)
       expect(loading.value).toBe(false)
-      expect(error.value).toBe(null)
       expect(result).toEqual(mockArticles)
     })
 
@@ -75,13 +73,12 @@ describe('useArticle', () => {
 
       mockApiClient.get.mockRejectedValue(mockError)
 
-      const { list, articles, loading, error } = useArticle()
+      const { list, articles, loading } = useArticle()
 
       await expect(list()).rejects.toEqual(mockError)
 
       expect(articles.value).toEqual([])
       expect(loading.value).toBe(false)
-      expect(error.value).toEqual(mockError)
     })
   })
 
@@ -92,14 +89,13 @@ describe('useArticle', () => {
 
       mockApiClient.get.mockResolvedValue(mockArticle)
 
-      const { get, currentArticle, loading, error } = useArticle()
+      const { get, currentArticle, loading } = useArticle()
 
       const result = await get(slug)
 
       expect(mockApiClient.get).toHaveBeenCalledWith('/articles/test-article')
       expect(currentArticle.value).toEqual(mockArticle)
       expect(loading.value).toBe(false)
-      expect(error.value).toBe(null)
       expect(result).toEqual(mockArticle)
     })
 
@@ -141,12 +137,11 @@ describe('useArticle', () => {
 
       mockApiClient.get.mockRejectedValue(mockError)
 
-      const { get, currentArticle, error } = useArticle()
+      const { get, currentArticle } = useArticle()
 
       await expect(get(slug)).rejects.toEqual(mockError)
 
       expect(currentArticle.value).toBe(null)
-      expect(error.value).toEqual(mockError)
     })
   })
 
@@ -157,14 +152,13 @@ describe('useArticle', () => {
 
       mockApiClient.post.mockResolvedValue(mockCreatedArticle)
 
-      const { create, articles, loading, error } = useArticle()
+      const { create, articles, loading } = useArticle()
 
       const result = await create(mockNewArticle)
 
       expect(mockApiClient.post).toHaveBeenCalledWith('/articles', mockNewArticle)
       expect(articles.value[0]).toEqual(mockCreatedArticle)
       expect(loading.value).toBe(false)
-      expect(error.value).toBe(null)
       expect(result).toEqual(mockCreatedArticle)
     })
 
@@ -240,10 +234,9 @@ describe('useArticle', () => {
 
       mockApiClient.post.mockRejectedValue(mockError)
 
-      const { create, error } = useArticle()
+      const { create } = useArticle()
 
       await expect(create(mockNewArticle)).rejects.toEqual(mockError)
-      expect(error.value).toEqual(mockError)
     })
   })
 
@@ -255,13 +248,12 @@ describe('useArticle', () => {
 
       mockApiClient.put.mockResolvedValue(mockUpdatedArticle)
 
-      const { update, loading, error } = useArticle()
+      const { update, loading } = useArticle()
 
       const result = await update(slug, mockUpdateData)
 
       expect(mockApiClient.put).toHaveBeenCalledWith(`/articles/${slug}`, mockUpdateData)
       expect(loading.value).toBe(false)
-      expect(error.value).toBe(null)
       expect(result).toEqual(mockUpdatedArticle)
     })
 
@@ -376,10 +368,9 @@ describe('useArticle', () => {
 
       mockApiClient.put.mockRejectedValue(mockError)
 
-      const { update, error } = useArticle()
+      const { update } = useArticle()
 
       await expect(update(slug, mockUpdateData)).rejects.toEqual(mockError)
-      expect(error.value).toEqual(mockError)
     })
   })
 
@@ -389,13 +380,12 @@ describe('useArticle', () => {
 
       mockApiClient.delete.mockResolvedValue(undefined)
 
-      const { remove, loading, error } = useArticle()
+      const { remove, loading } = useArticle()
 
       await remove(slug)
 
       expect(mockApiClient.delete).toHaveBeenCalledWith(`/articles/${slug}`)
       expect(loading.value).toBe(false)
-      expect(error.value).toBe(null)
     })
 
     it('should set loading to true during remove and false after completion', async () => {
@@ -478,98 +468,9 @@ describe('useArticle', () => {
 
       mockApiClient.delete.mockRejectedValue(mockError)
 
-      const { remove, error } = useArticle()
+      const { remove } = useArticle()
 
       await expect(remove(slug)).rejects.toEqual(mockError)
-      expect(error.value).toEqual(mockError)
-    })
-  })
-
-  describe('error clearing', () => {
-    it('should clear previous error on successful list', async () => {
-      const mockArticles = createMockArticlesList(2)
-      const mockError = createMockApiError(500, 'Server error')
-
-      mockApiClient.get.mockRejectedValueOnce(mockError).mockResolvedValueOnce(mockArticles)
-
-      const { list, error } = useArticle()
-
-      // First call fails
-      await expect(list()).rejects.toEqual(mockError)
-      expect(error.value).toEqual(mockError)
-
-      // Second call succeeds and clears error
-      await list()
-      expect(error.value).toBe(null)
-    })
-
-    it('should clear previous error on successful get', async () => {
-      const mockArticle = createMockArticle()
-      const mockError = createMockApiError(404, 'Not found')
-
-      mockApiClient.get.mockRejectedValueOnce(mockError).mockResolvedValueOnce(mockArticle)
-
-      const { get, error } = useArticle()
-
-      // First call fails
-      await expect(get('non-existent')).rejects.toEqual(mockError)
-      expect(error.value).toEqual(mockError)
-
-      // Second call succeeds and clears error
-      await get('test-article')
-      expect(error.value).toBe(null)
-    })
-
-    it('should clear previous error on successful create', async () => {
-      const mockNewArticle = createMockNewArticle()
-      const mockCreatedArticle = createMockArticle()
-      const mockError = createMockApiError(400, 'Bad request')
-
-      mockApiClient.post.mockRejectedValueOnce(mockError).mockResolvedValueOnce(mockCreatedArticle)
-
-      const { create, error } = useArticle()
-
-      // First call fails
-      await expect(create(mockNewArticle)).rejects.toEqual(mockError)
-      expect(error.value).toEqual(mockError)
-
-      // Second call succeeds and clears error
-      await create(mockNewArticle)
-      expect(error.value).toBe(null)
-    })
-
-    it('should clear previous error on successful update', async () => {
-      const mockUpdateData = createMockUpdateArticle()
-      const mockUpdatedArticle = createMockArticle()
-      const mockError = createMockApiError(404, 'Not found')
-
-      mockApiClient.put.mockRejectedValueOnce(mockError).mockResolvedValueOnce(mockUpdatedArticle)
-
-      const { update, error } = useArticle()
-
-      // First call fails
-      await expect(update('non-existent', mockUpdateData)).rejects.toEqual(mockError)
-      expect(error.value).toEqual(mockError)
-
-      // Second call succeeds and clears error
-      await update('test-article', mockUpdateData)
-      expect(error.value).toBe(null)
-    })
-
-    it('should clear previous error on successful remove', async () => {
-      const mockError = createMockApiError(404, 'Not found')
-
-      mockApiClient.delete.mockRejectedValueOnce(mockError).mockResolvedValueOnce(undefined)
-
-      const { remove, error } = useArticle()
-
-      // First call fails
-      await expect(remove('non-existent')).rejects.toEqual(mockError)
-      expect(error.value).toEqual(mockError)
-
-      // Second call succeeds and clears error
-      await remove('test-article')
-      expect(error.value).toBe(null)
     })
   })
 
