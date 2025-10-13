@@ -27,13 +27,13 @@ export function useAlert() {
     }
 
     // Auto-hide after specified duration
-    // duration: number = auto-hide after ms
-    // duration: null = never auto-hide (user must manually close)
-    // duration: undefined = use default duration
-    const duration = options.duration !== undefined ? options.duration : ALERT_AUTO_HIDE_DURATION
+    // Infinity = never auto-hide (user must manually close)
+    // finite number = auto-hide after N milliseconds
+    // undefined = use default duration
+    const duration = options.duration ?? ALERT_AUTO_HIDE_DURATION
 
-    // Only set timeout if duration is not null
-    if (duration !== null) {
+    // Only set timeout if duration is finite (not Infinity)
+    if (isFinite(duration)) {
       autoHideTimeout = setTimeout(() => {
         hideAlert()
       }, duration)

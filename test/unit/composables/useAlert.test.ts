@@ -167,14 +167,14 @@ describe('useAlert', () => {
     expect(alert.value.show).toBe(false)
   })
 
-  it('should not auto-hide when duration is null', () => {
+  it('should not auto-hide when duration is Infinity', () => {
     const { alert, showAlert } = useAlert()
 
     showAlert({
       variant: 'destructive',
       title: 'Error',
       message: 'API connection failed',
-      duration: null
+      duration: Infinity
     })
 
     expect(alert.value.show).toBe(true)
@@ -205,14 +205,14 @@ describe('useAlert', () => {
     expect(alert.value.show).toBe(false)
   })
 
-  it('should allow manual close even when duration is null', () => {
+  it('should allow manual close even when duration is Infinity', () => {
     const { alert, showAlert, hideAlert } = useAlert()
 
     showAlert({
       variant: 'destructive',
       title: 'Error',
       message: 'API connection failed',
-      duration: null
+      duration: Infinity
     })
 
     expect(alert.value.show).toBe(true)

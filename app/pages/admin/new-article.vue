@@ -39,7 +39,7 @@ const handleSubmit = async (articleFormValues: ArticleFormValues) => {
         variant: 'destructive',
         title: 'Error',
         message: createError.value.message,
-        duration: null // Don't auto-hide error messages
+        duration: Infinity // Never auto-hide error messages
       })
     }
   }

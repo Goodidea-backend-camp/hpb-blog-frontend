@@ -12,6 +12,8 @@ const props = withDefaults(
     dismissible?: boolean
   }>(),
   {
+    class: undefined,
+    variant: 'default',
     dismissible: true
   }
 )
