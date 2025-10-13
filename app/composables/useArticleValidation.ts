@@ -14,9 +14,9 @@ import * as z from 'zod'
 export const articleFormSchema = toTypedSchema(
   z
     .object({
-      title: z.string().min(1, 'Title is required').trim(),
-      slug: z.string().min(1, 'Slug is required').trim(),
-      content: z.string().min(1, 'Content is required').trim(),
+      title: z.string().trim().min(1, 'Title is required'),
+      slug: z.string().trim().min(1, 'Slug is required'),
+      content: z.string().trim().min(1, 'Content is required'),
       publishSetting: z.enum(['save-draft', 'publish-immediate', 'publish-scheduled']),
       scheduledDateTime: z.string().optional()
     })
