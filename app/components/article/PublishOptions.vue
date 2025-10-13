@@ -28,7 +28,7 @@ const isScheduledPublish = computed(() => props.publishSetting === 'publish-sche
       :model-value="publishSetting"
       :disabled="disabled"
       class="flex-col gap-3"
-      @update:model-value="(val) => emit('update:publishSetting', val as ArticleAction)"
+      @update:model-value="(val: string) => emit('update:publishSetting', val as ArticleAction)"
     >
       <div class="flex items-center gap-2">
         <RadioGroupItem id="publish-immediate" value="publish-immediate" />
@@ -56,7 +56,7 @@ const isScheduledPublish = computed(() => props.publishSetting === 'publish-sche
 
       <div class="flex items-center gap-2">
         <RadioGroupItem id="save-draft" value="save-draft" />
-        <Label for="save-draft" class="cursor-pointer"> Save as draft</Label>
+        <Label for="save-draft" class="cursor-pointer"> Save as draft </Label>
       </div>
     </RadioGroup>
   </div>
