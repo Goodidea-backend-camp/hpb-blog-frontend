@@ -56,7 +56,7 @@ const isScheduledPublish = computed(() => props.publishSetting === 'publish-sche
 
       <div class="flex items-center gap-2">
         <RadioGroupItem id="save-draft" value="save-draft" />
-        <Label for="save-draft" class="cursor-pointer"> Save as draft (don't publish yet) </Label>
+        <Label for="save-draft" class="cursor-pointer"> Save as draft</Label>
       </div>
     </RadioGroup>
   </div>
