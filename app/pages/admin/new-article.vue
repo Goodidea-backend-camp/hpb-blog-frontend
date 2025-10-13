@@ -33,7 +33,6 @@ const handleSubmit = async (articleFormValues: ArticleFormValues) => {
     }
   } catch {
     // createError.value is already set by useArticle
-    // API errors should not auto-hide - user must acknowledge them
     if (createError.value) {
       showAlert({
         variant: 'destructive',

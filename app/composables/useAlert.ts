@@ -26,10 +26,6 @@ export function useAlert() {
       message: options.message
     }
 
-    // Auto-hide after specified duration
-    // Infinity = never auto-hide (user must manually close)
-    // finite number = auto-hide after N milliseconds
-    // undefined = use default duration
     const duration = options.duration ?? ALERT_AUTO_HIDE_DURATION
 
     // Only set timeout if duration is finite (not Infinity)
