@@ -15,10 +15,13 @@ definePageMeta({
 
 const router = useRouter()
 const { create, loading, error: createError } = useArticle()
-const { alert, showAlert } = useAlert()
+const { alert, showAlert, hideAlert } = useAlert()
 
 // Submit handler
 const handleSubmit = async (articleFormValues: ArticleFormValues) => {
+  // Clear any existing alert before starting new operation
+  hideAlert()
+
   try {
     const payload = buildNewArticlePayload(articleFormValues)
     const result = await create(payload)
@@ -30,8 +33,14 @@ const handleSubmit = async (articleFormValues: ArticleFormValues) => {
     }
   } catch {
     // createError.value is already set by useArticle
+    // API errors should not auto-hide - user must acknowledge them
     if (createError.value) {
-      showAlert({ variant: 'destructive', title: 'Error', message: createError.value.message })
+      showAlert({
+        variant: 'destructive',
+        title: 'Error',
+        message: createError.value.message,
+        duration: null // Don't auto-hide error messages
+      })
     }
   }
 }
@@ -57,7 +66,7 @@ const getSuccessMessage = (publishSetting: ArticleFormValues['publishSetting']) 
       <p class="text-muted-foreground mt-2">Create a new blog article</p>
     </div>
 
-    <Alert v-if="alert.show" :variant="alert.variant" class="mb-6">
+    <Alert v-if="alert.show" :variant="alert.variant" class="mb-6" @close="hideAlert">
       <AlertTitle>{{ alert.title }}</AlertTitle>
       <AlertDescription>{{ alert.message }}</AlertDescription>
     </Alert>

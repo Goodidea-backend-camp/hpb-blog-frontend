@@ -16,6 +16,7 @@ export function useAlert() {
     // Clear existing auto-hide timeout to prevent memory leaks
     if (autoHideTimeout) {
       clearTimeout(autoHideTimeout)
+      autoHideTimeout = null
     }
 
     alert.value = {
@@ -26,10 +27,17 @@ export function useAlert() {
     }
 
     // Auto-hide after specified duration
-    const duration = options.duration ?? ALERT_AUTO_HIDE_DURATION
-    autoHideTimeout = setTimeout(() => {
-      hideAlert()
-    }, duration)
+    // duration: number = auto-hide after ms
+    // duration: null = never auto-hide (user must manually close)
+    // duration: undefined = use default duration
+    const duration = options.duration !== undefined ? options.duration : ALERT_AUTO_HIDE_DURATION
+
+    // Only set timeout if duration is not null
+    if (duration !== null) {
+      autoHideTimeout = setTimeout(() => {
+        hideAlert()
+      }, duration)
+    }
   }
 
   //Hide the alert immediately

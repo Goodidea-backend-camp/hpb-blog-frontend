@@ -166,4 +166,60 @@ describe('useAlert', () => {
     vi.advanceTimersByTime(ALERT_AUTO_HIDE_DURATION)
     expect(alert.value.show).toBe(false)
   })
+
+  it('should not auto-hide when duration is null', () => {
+    const { alert, showAlert } = useAlert()
+
+    showAlert({
+      variant: 'destructive',
+      title: 'Error',
+      message: 'API connection failed',
+      duration: null
+    })
+
+    expect(alert.value.show).toBe(true)
+
+    // Fast-forward a very long time
+    vi.advanceTimersByTime(60000) // 60 seconds
+
+    // Alert should still be visible
+    expect(alert.value.show).toBe(true)
+    expect(alert.value.title).toBe('Error')
+  })
+
+  it('should hide immediately when duration is 0', () => {
+    const { alert, showAlert } = useAlert()
+
+    showAlert({
+      variant: 'default',
+      title: 'Test',
+      message: 'Test message',
+      duration: 0
+    })
+
+    expect(alert.value.show).toBe(true)
+
+    // Advance time by 0 (should hide immediately)
+    vi.advanceTimersByTime(0)
+
+    expect(alert.value.show).toBe(false)
+  })
+
+  it('should allow manual close even when duration is null', () => {
+    const { alert, showAlert, hideAlert } = useAlert()
+
+    showAlert({
+      variant: 'destructive',
+      title: 'Error',
+      message: 'API connection failed',
+      duration: null
+    })
+
+    expect(alert.value.show).toBe(true)
+
+    // User manually closes the alert
+    hideAlert()
+
+    expect(alert.value.show).toBe(false)
+  })
 })
