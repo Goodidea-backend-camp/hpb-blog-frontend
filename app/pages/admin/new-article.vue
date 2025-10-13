@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { definePageMeta } from '#imports'
 import ArticleForm from '@/components/article/ArticleForm.vue'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { useArticle } from '@/composables/useArticle'
+import { useAlert } from '@/composables/useAlert'
 import { buildNewArticlePayload } from '@/composables/useArticlePayload'
+import { NAVIGATION_DELAY_AFTER_SUCCESS } from '@/constants/alert'
 import type { ArticleFormValues } from '@/types/form'
 
 definePageMeta({
@@ -14,38 +15,24 @@ definePageMeta({
 
 const router = useRouter()
 const { create, loading, error: createError } = useArticle()
-
-// Notification state
-const notification = ref<{
-  show: boolean
-  variant: 'default' | 'destructive'
-  title: string
-  message: string
-}>({
-  show: false,
-  variant: 'default',
-  title: '',
-  message: ''
-})
-
-const showNotification = (variant: 'default' | 'destructive', title: string, message: string) => {
-  notification.value = { show: true, variant, title, message }
-  setTimeout(() => {
-    notification.value.show = false
-  }, 5000)
-}
+const { alert, showAlert } = useAlert()
 
 // Submit handler
 const handleSubmit = async (articleFormValues: ArticleFormValues) => {
-  const payload = buildNewArticlePayload(articleFormValues)
-  const result = await create(payload)
+  try {
+    const payload = buildNewArticlePayload(articleFormValues)
+    const result = await create(payload)
 
-  if (result) {
-    const message = getSuccessMessage(articleFormValues.publishSetting)
-    showNotification('default', 'Success', message)
-    setTimeout(() => router.push('/admin'), 1500)
-  } else if (createError.value) {
-    showNotification('destructive', 'Error', createError.value.message)
+    if (result) {
+      const message = getSuccessMessage(articleFormValues.publishSetting)
+      showAlert({ variant: 'default', title: 'Success', message })
+      setTimeout(() => router.push('/admin'), NAVIGATION_DELAY_AFTER_SUCCESS)
+    }
+  } catch {
+    // createError.value is already set by useArticle
+    if (createError.value) {
+      showAlert({ variant: 'destructive', title: 'Error', message: createError.value.message })
+    }
   }
 }
 
@@ -70,9 +57,9 @@ const getSuccessMessage = (publishSetting: ArticleFormValues['publishSetting']) 
       <p class="text-muted-foreground mt-2">Create a new blog article</p>
     </div>
 
-    <Alert v-if="notification.show" :variant="notification.variant" class="mb-6">
-      <AlertTitle>{{ notification.title }}</AlertTitle>
-      <AlertDescription>{{ notification.message }}</AlertDescription>
+    <Alert v-if="alert.show" :variant="alert.variant" class="mb-6">
+      <AlertTitle>{{ alert.title }}</AlertTitle>
+      <AlertDescription>{{ alert.message }}</AlertDescription>
     </Alert>
 
     <ArticleForm :loading="loading" @submit="handleSubmit" />
