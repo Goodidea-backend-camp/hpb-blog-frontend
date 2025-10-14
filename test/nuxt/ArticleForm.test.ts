@@ -59,8 +59,10 @@ vi.mock('lucide-vue-next', () => ({
 }))
 
 // Mock vee-validate
-vi.mock('vee-validate', () => ({
-  useForm: vi.fn(() => ({
+const { mockResetForm, mockMeta, useFormMock } = vi.hoisted(() => {
+  const mockResetForm = vi.fn()
+  const mockMeta = { value: { dirty: false } }
+  const useFormMock = vi.fn(() => ({
     handleSubmit: vi.fn((callback) => () => {
       // Mock valid form data
       const mockFormValues: ArticleFormValues = {
@@ -78,8 +80,15 @@ vi.mock('vee-validate', () => ({
     errors: {
       value: {}
     },
-    setFieldValue: vi.fn()
+    setFieldValue: vi.fn(),
+    resetForm: mockResetForm,
+    meta: mockMeta
   }))
+  return { mockResetForm, mockMeta, useFormMock }
+})
+
+vi.mock('vee-validate', () => ({
+  useForm: useFormMock
 }))
 
 vi.mock('@/composables/useArticleValidation', () => ({
@@ -385,5 +394,66 @@ describe('ArticleForm - Duplicate Submission Prevention', () => {
       const fieldsetHtml = fieldset.html()
       expect(fieldsetHtml).not.toContain('type="submit"')
     })
+  })
+})
+
+describe('ArticleForm - initialValues reactivity', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockMeta.value.dirty = false // Reset dirty state before each test
+  })
+
+  it('should not call resetForm on initial mount with empty props', async () => {
+    await mountSuspended(ArticleForm)
+    expect(mockResetForm).not.toHaveBeenCalled()
+  })
+
+  it('should call resetForm when initialValues prop is updated', async () => {
+    const wrapper = await mountSuspended(ArticleForm)
+
+    const newValues: Partial<ArticleFormValues> = {
+      title: 'Loaded Title',
+      slug: 'loaded-slug',
+      content: 'Loaded content'
+    }
+
+    await wrapper.setProps({ initialValues: newValues })
+    await nextTick()
+
+    expect(mockResetForm).toHaveBeenCalledTimes(1)
+    expect(mockResetForm).toHaveBeenCalledWith({
+      values: {
+        title: 'Loaded Title',
+        slug: 'loaded-slug',
+        content: 'Loaded content',
+        publishSetting: 'publish-immediate',
+        scheduledDateTime: ''
+      }
+    })
+  })
+
+  it('should NOT call resetForm when initialValues prop is updated if form is dirty', async () => {
+    mockMeta.value.dirty = true // Simulate user has edited the form
+
+    const wrapper = await mountSuspended(ArticleForm)
+
+    const newValues: Partial<ArticleFormValues> = {
+      title: 'Another Title'
+    }
+
+    await wrapper.setProps({ initialValues: newValues })
+    await nextTick()
+
+    expect(mockResetForm).not.toHaveBeenCalled()
+  })
+
+  it('should not call resetForm if initialValues is an empty object', async () => {
+    const wrapper = await mountSuspended(ArticleForm)
+
+    // The default prop is an empty object, this simulates that scenario again
+    await wrapper.setProps({ initialValues: {} })
+    await nextTick()
+
+    expect(mockResetForm).not.toHaveBeenCalled()
   })
 })

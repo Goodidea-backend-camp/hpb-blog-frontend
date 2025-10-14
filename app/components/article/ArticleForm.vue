@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watchEffect } from 'vue'
 import { useForm } from 'vee-validate'
 import { Loader2 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
@@ -28,11 +28,30 @@ const emit = defineEmits<{
 const articleForm = useForm({
   validationSchema: articleFormSchema,
   initialValues: {
-    title: props.initialValues?.title || '',
-    slug: props.initialValues?.slug || '',
-    content: props.initialValues?.content || '',
-    publishSetting: props.initialValues?.publishSetting || 'publish-immediate',
-    scheduledDateTime: props.initialValues?.scheduledDateTime || ''
+    title: '',
+    slug: '',
+    content: '',
+    publishSetting: 'publish-immediate',
+    scheduledDateTime: ''
+  }
+})
+
+watchEffect(() => {
+  // Only reset the form if it hasn't been edited by the user and initialValues is not the default empty object
+  if (
+    props.initialValues &&
+    Object.keys(props.initialValues).length > 0 &&
+    !articleForm.meta.value.dirty
+  ) {
+    articleForm.resetForm({
+      values: {
+        title: props.initialValues.title || '',
+        slug: props.initialValues.slug || '',
+        content: props.initialValues.content || '',
+        publishSetting: props.initialValues.publishSetting || 'publish-immediate',
+        scheduledDateTime: props.initialValues.scheduledDateTime || ''
+      }
+    })
   }
 })
 
