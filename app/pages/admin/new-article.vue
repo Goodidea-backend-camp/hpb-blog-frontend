@@ -7,7 +7,6 @@ import { useArticle } from '@/composables/useArticle'
 import { useAlert } from '@/composables/useAlert'
 import { buildNewArticlePayload } from '@/composables/useArticlePayload'
 import { NAVIGATION_DELAY_AFTER_SUCCESS } from '@/constants/alert'
-import { getErrorMessage } from '@/utils/errors'
 import type { ArticleFormValues } from '@/types/form'
 
 definePageMeta({
@@ -32,14 +31,9 @@ const handleSubmit = async (articleFormValues: ArticleFormValues) => {
       showAlert({ variant: 'default', title: 'Success', message })
       setTimeout(() => router.push('/admin'), NAVIGATION_DELAY_AFTER_SUCCESS)
     }
-  } catch (error) {
-    const errorMessage = getErrorMessage(error)
-    showAlert({
-      variant: 'destructive',
-      title: 'Error',
-      message: errorMessage,
-      duration: Infinity // Never auto-hide error messages
-    })
+  } catch {
+    // Error is already handled by useArticle with toast
+    // No need to show additional error alert here
   }
 }
 
