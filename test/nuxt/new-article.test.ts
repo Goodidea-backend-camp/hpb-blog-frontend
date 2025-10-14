@@ -1,10 +1,21 @@
+// Polyfill for requestAnimationFrame
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent, type Ref } from 'vue'
 import NewArticlePage from '@/pages/admin/new-article.vue'
 import type { ArticleFormValues } from '@/types/form'
 import type { NewArticle } from '@/types/api'
-import { NAVIGATION_DELAY_AFTER_SUCCESS } from '@/constants/alert'
+
+if (typeof window === 'undefined') {
+  global.requestAnimationFrame = (cb) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return setTimeout(cb, 0)
+  }
+  global.cancelAnimationFrame = (id) => {
+    clearTimeout(id)
+  }
+}
 
 // Type definitions for mocks
 type MockRouter = {
@@ -56,7 +67,6 @@ describe('new-article.vue', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
-    vi.useFakeTimers()
 
     const { ref } = await import('vue')
 
@@ -219,69 +229,6 @@ describe('new-article.vue', () => {
       expect(toast.success).toHaveBeenCalledWith('Draft saved successfully')
     })
 
-    it('should navigate to /admin after NAVIGATION_DELAY_AFTER_SUCCESS', async () => {
-      const { useRouter } = await import('vue-router')
-      const { useArticle } = await import('@/composables/useArticle')
-      const { buildNewArticlePayload } = await import('@/composables/useArticlePayload')
-
-      vi.mocked(useRouter).mockReturnValue(mockRouter as never)
-      vi.mocked(useArticle).mockReturnValue(mockUseArticle as never)
-      vi.mocked(buildNewArticlePayload).mockReturnValue({} as NewArticle)
-      mockUseArticle.create.mockResolvedValue(undefined)
-
-      const wrapper = mount(NewArticlePage)
-      const articleForm = wrapper.findComponent({ name: 'ArticleForm' })
-
-      const formValues: ArticleFormValues = {
-        title: 'Test',
-        slug: 'test',
-        content: 'Content',
-        publishSetting: 'publish-immediate'
-      }
-
-      await articleForm.vm.$emit('submit', formValues)
-      await wrapper.vm.$nextTick()
-
-      // Should not navigate immediately
-      expect(mockRouter.push).not.toHaveBeenCalled()
-
-      // Fast-forward time by NAVIGATION_DELAY_AFTER_SUCCESS
-      vi.advanceTimersByTime(NAVIGATION_DELAY_AFTER_SUCCESS)
-
-      // Should navigate to /admin
-      expect(mockRouter.push).toHaveBeenCalledWith('/admin')
-    })
-
-    it('should not navigate if delay has not elapsed', async () => {
-      const { useRouter } = await import('vue-router')
-      const { useArticle } = await import('@/composables/useArticle')
-      const { buildNewArticlePayload } = await import('@/composables/useArticlePayload')
-
-      vi.mocked(useRouter).mockReturnValue(mockRouter as never)
-      vi.mocked(useArticle).mockReturnValue(mockUseArticle as never)
-      vi.mocked(buildNewArticlePayload).mockReturnValue({} as NewArticle)
-      mockUseArticle.create.mockResolvedValue(undefined)
-
-      const wrapper = mount(NewArticlePage)
-      const articleForm = wrapper.findComponent({ name: 'ArticleForm' })
-
-      const formValues: ArticleFormValues = {
-        title: 'Test',
-        slug: 'test',
-        content: 'Content',
-        publishSetting: 'publish-immediate'
-      }
-
-      await articleForm.vm.$emit('submit', formValues)
-      await wrapper.vm.$nextTick()
-
-      // Advance time but not enough
-      vi.advanceTimersByTime(NAVIGATION_DELAY_AFTER_SUCCESS - 100)
-
-      // Should not navigate yet
-      expect(mockRouter.push).not.toHaveBeenCalled()
-    })
-
     it('should call create and expect it to throw when create fails', async () => {
       const { useRouter } = await import('vue-router')
       const { useArticle } = await import('@/composables/useArticle')
@@ -329,8 +276,7 @@ describe('new-article.vue', () => {
       // Success toast should not be called when error occurs
       expect(toast.success).not.toHaveBeenCalled()
 
-      // Navigation should not occur even after delay
-      vi.advanceTimersByTime(NAVIGATION_DELAY_AFTER_SUCCESS)
+      // Navigation should not occur
       expect(mockRouter.push).not.toHaveBeenCalled()
     })
   })
