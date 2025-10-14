@@ -13,6 +13,16 @@ export function useArticle() {
   // Get API client with automatic token injection
   const apiClient = useApiClient()
 
+  // Handle API errors with toast notification
+  const handleError = (e: unknown, message: string): never => {
+    const apiError = e as ApiError
+    error.value = apiError
+    toast.error(message, {
+      description: apiError.message
+    })
+    throw e
+  }
+
   async function list() {
     loading.value = true
     error.value = null
@@ -22,12 +32,7 @@ export function useArticle() {
       articles.value = result
       return result
     } catch (e) {
-      const apiError = e as ApiError
-      error.value = apiError
-      toast.error('Failed to load articles', {
-        description: apiError.message
-      })
-      throw e
+      handleError(e, 'Failed to load articles')
     } finally {
       loading.value = false
     }
@@ -42,12 +47,7 @@ export function useArticle() {
       currentArticle.value = result
       return result
     } catch (e) {
-      const apiError = e as ApiError
-      error.value = apiError
-      toast.error('Failed to load article', {
-        description: apiError.message
-      })
-      throw e
+      handleError(e, 'Failed to load article')
     } finally {
       loading.value = false
     }
@@ -63,12 +63,7 @@ export function useArticle() {
       articles.value = [result, ...articles.value]
       return result
     } catch (e) {
-      const apiError = e as ApiError
-      error.value = apiError
-      toast.error('Failed to create article', {
-        description: apiError.message
-      })
-      throw e
+      handleError(e, 'Failed to create article')
     } finally {
       loading.value = false
     }
@@ -91,12 +86,7 @@ export function useArticle() {
       }
       return result
     } catch (e) {
-      const apiError = e as ApiError
-      error.value = apiError
-      toast.error('Failed to update article', {
-        description: apiError.message
-      })
-      throw e
+      handleError(e, 'Failed to update article')
     } finally {
       loading.value = false
     }
@@ -115,12 +105,7 @@ export function useArticle() {
         currentArticle.value = null
       }
     } catch (e) {
-      const apiError = e as ApiError
-      error.value = apiError
-      toast.error('Failed to delete article', {
-        description: apiError.message
-      })
-      throw e
+      handleError(e, 'Failed to delete article')
     } finally {
       loading.value = false
     }
