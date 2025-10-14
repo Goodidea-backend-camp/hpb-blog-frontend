@@ -6,4 +6,5 @@ export interface ArticleFormValues {
   scheduledDateTime?: string
 }
 
-export type ArticleAction = 'save-draft' | 'publish-immediate' | 'publish-scheduled'
+export const ARTICLE_ACTIONS = ['publish-immediate', 'publish-scheduled', 'save-draft'] as const
+export type ArticleAction = (typeof ARTICLE_ACTIONS)[number]

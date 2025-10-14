@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import type { ArticleAction } from '@/types/form'
+import { ARTICLE_ACTIONS, type ArticleAction } from '@/types/form'
 
 interface Props {
   publishSetting: ArticleAction
@@ -20,6 +20,18 @@ const emit = defineEmits<{
 }>()
 
 const isScheduledPublish = computed(() => props.publishSetting === 'publish-scheduled')
+
+const isValidArticleAction = (val: string): val is ArticleAction => {
+  return (ARTICLE_ACTIONS as readonly string[]).includes(val)
+}
+
+const handlePublishSettingUpdate = (val: string) => {
+  if (isValidArticleAction(val)) {
+    emit('update:publishSetting', val)
+  } else {
+    console.error(`Invalid article action: ${val}`)
+  }
+}
 </script>
 
 <template>
@@ -28,7 +40,7 @@ const isScheduledPublish = computed(() => props.publishSetting === 'publish-sche
       :model-value="publishSetting"
       :disabled="disabled"
       class="flex-col gap-3"
-      @update:model-value="(val: string) => emit('update:publishSetting', val as ArticleAction)"
+      @update:model-value="handlePublishSettingUpdate"
     >
       <div class="flex items-center gap-2">
         <RadioGroupItem id="publish-immediate" value="publish-immediate" />
