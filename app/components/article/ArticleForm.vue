@@ -52,73 +52,77 @@ const submitButtonText = computed(() => {
   }
 })
 
-// Submit handler
 const handleSubmit = articleForm.handleSubmit((articleFormValues) => {
+  // Prevent duplicate submission during loading
+  if (props.loading) {
+    return
+  }
   emit('submit', articleFormValues)
 })
 </script>
 
 <template>
-  <form class="space-y-6">
-    <!-- Title -->
-    <FormField v-slot="{ componentField }" name="title">
-      <FormItem>
-        <FormLabel>Title *</FormLabel>
-        <FormControl>
-          <Input v-bind="componentField" placeholder="Enter article title" :disabled="loading" />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    </FormField>
+  <form class="space-y-6" @submit.prevent="handleSubmit">
+    <fieldset
+      :disabled="loading"
+      class="space-y-6"
+      :class="{ 'pointer-events-none opacity-60': loading }"
+    >
+      <!-- Title -->
+      <FormField v-slot="{ componentField }" name="title">
+        <FormItem>
+          <FormLabel>Title *</FormLabel>
+          <FormControl>
+            <Input v-bind="componentField" placeholder="Enter article title" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
 
-    <!-- Slug -->
-    <FormField v-slot="{ componentField }" name="slug">
-      <FormItem>
-        <FormLabel>Slug *</FormLabel>
-        <FormControl>
-          <Input v-bind="componentField" placeholder="enter-article-slug" :disabled="loading" />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    </FormField>
+      <!-- Slug -->
+      <FormField v-slot="{ componentField }" name="slug">
+        <FormItem>
+          <FormLabel>Slug *</FormLabel>
+          <FormControl>
+            <Input v-bind="componentField" placeholder="enter-article-slug" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
 
-    <!-- Content -->
-    <FormField v-slot="{ value, handleChange }" name="content">
-      <FormItem>
-        <FormLabel>Content *</FormLabel>
-        <FormControl>
-          <TinyMceEditor
-            :model-value="value"
-            :disabled="loading"
-            @update:model-value="handleChange"
-          />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    </FormField>
+      <!-- Content -->
+      <FormField v-slot="{ value, handleChange }" name="content">
+        <FormItem>
+          <FormLabel>Content *</FormLabel>
+          <FormControl>
+            <TinyMceEditor :model-value="value" @update:model-value="handleChange" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
 
-    <!-- Publish Settings -->
-    <FormField v-slot="{ value, handleChange }" name="publishSetting">
-      <FormItem>
-        <FormLabel>Publish Settings</FormLabel>
-        <FormControl>
-          <PublishOptions
-            :publish-setting="value"
-            :scheduled-date-time="articleForm.values.scheduledDateTime"
-            :disabled="loading"
-            :error="isScheduledPublish ? articleForm.errors.value.scheduledDateTime : undefined"
-            @update:publish-setting="handleChange"
-            @update:scheduled-date-time="
-              (val) => articleForm.setFieldValue('scheduledDateTime', val)
-            "
-          />
-        </FormControl>
-      </FormItem>
-    </FormField>
+      <!-- Publish Settings -->
+      <FormField v-slot="{ value, handleChange }" name="publishSetting">
+        <FormItem>
+          <FormLabel>Publish Settings</FormLabel>
+          <FormControl>
+            <PublishOptions
+              :publish-setting="value"
+              :scheduled-date-time="articleForm.values.scheduledDateTime"
+              :error="isScheduledPublish ? articleForm.errors.value.scheduledDateTime : undefined"
+              @update:publish-setting="handleChange"
+              @update:scheduled-date-time="
+                (val) => articleForm.setFieldValue('scheduledDateTime', val)
+              "
+            />
+          </FormControl>
+        </FormItem>
+      </FormField>
+    </fieldset>
 
     <!-- Action Button -->
     <div class="flex gap-4 pt-4">
-      <Button type="button" class="cursor-pointer" :disabled="loading" @click="handleSubmit">
+      <Button type="submit" class="cursor-pointer" :disabled="loading">
         <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
         {{ submitButtonText }}
       </Button>
