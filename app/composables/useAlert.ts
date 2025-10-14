@@ -1,4 +1,4 @@
-import { ref, readonly } from 'vue'
+import { ref, readonly, onUnmounted, getCurrentInstance } from 'vue'
 import { ALERT_AUTO_HIDE_DURATION } from '@/constants/alert'
 import type { AlertState, ShowAlertOptions } from '@/types/alert'
 
@@ -12,12 +12,23 @@ export function useAlert() {
 
   let autoHideTimeout: ReturnType<typeof setTimeout> | null = null
 
-  const showAlert = (options: ShowAlertOptions) => {
-    // Clear existing auto-hide timeout to prevent memory leaks
+  // Only register lifecycle hook if called within a component context
+  if (getCurrentInstance()) {
+    onUnmounted(() => {
+      cleanupTimeout()
+    })
+  }
+
+  const cleanupTimeout = () => {
     if (autoHideTimeout) {
       clearTimeout(autoHideTimeout)
       autoHideTimeout = null
     }
+  }
+
+  const showAlert = (options: ShowAlertOptions) => {
+    // Clear existing auto-hide timeout to prevent memory leaks
+    cleanupTimeout()
 
     alert.value = {
       show: true,
@@ -39,10 +50,7 @@ export function useAlert() {
   //Hide the alert immediately
   const hideAlert = () => {
     alert.value.show = false
-    if (autoHideTimeout) {
-      clearTimeout(autoHideTimeout)
-      autoHideTimeout = null
-    }
+    cleanupTimeout()
   }
 
   return {

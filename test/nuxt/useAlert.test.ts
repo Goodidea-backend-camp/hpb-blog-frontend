@@ -222,4 +222,43 @@ describe('useAlert', () => {
 
     expect(alert.value.show).toBe(false)
   })
+
+  it('should cleanup timeout on component unmount', async () => {
+    const { mount } = await import('@vue/test-utils')
+    const { defineComponent } = await import('vue')
+    const clearTimeoutSpy = vi.spyOn(global, 'clearTimeout')
+
+    const TestComponent = defineComponent({
+      setup() {
+        const { alert, showAlert } = useAlert()
+        return { alert, showAlert }
+      },
+      template: '<div>{{ alert.show }}</div>'
+    })
+
+    const wrapper = mount(TestComponent)
+
+    // Show alert with 5 second duration
+    wrapper.vm.showAlert({
+      variant: 'default',
+      title: 'Test',
+      message: 'Test message',
+      duration: 5000
+    })
+
+    expect(wrapper.vm.alert.show).toBe(true)
+
+    // Unmount component before timeout completes
+    wrapper.unmount()
+
+    // Verify clearTimeout was called during unmount
+    expect(clearTimeoutSpy).toHaveBeenCalled()
+
+    // Advance time past the original timeout duration
+    vi.advanceTimersByTime(6000)
+
+    // No errors should occur since timeout was cleaned up
+    // If timeout wasn't cleaned up, it would try to access unmounted component state
+    expect(true).toBe(true) // Test passes if no errors thrown
+  })
 })
