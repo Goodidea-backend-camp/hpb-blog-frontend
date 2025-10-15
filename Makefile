@@ -15,17 +15,15 @@ lint:
 
 lint-llm:
 	@set -o pipefail; \
-	(npx eslint . 2>&1 | grep -v -E '^\[nuxt\]|\[info\]|^ℹ|\[nitro\]') & \
-	(npx nuxt typecheck 2>&1 | grep -v -E '^\[nuxt\]|\[info\]|^ℹ|\[nitro\]|.*\[.*ms\]|.*↳|@tailwindcss') & \
+	(npx eslint . 2>&1 | scripts/filter-eslint-output.sh) & \
+	(npx nuxt typecheck 2>&1 | scripts/filter-typecheck-output.sh) & \
 	wait
 
 test:
 	@npx vitest run 
 
 test-llm:
-	@set -o pipefail; npx vitest run --reporter=dot 2>&1 | \
-		grep -v -E '^\[nuxt\]|\[info\]|^ℹ|\[nitro\]|.*\[.*ms\]|.*↳|\(node:.*\) Warning:|Use.*--trace-warnings|^·+$$|@tailwindcss|stdout \||\[nuxt-app\]|page:loading:|page:finish|app:created|app:beforeMount|app:mounted|vue:setup|app:suspense:resolve|<ref \*\d+>|Symbol\(|_uid:|_component:|_props:|_container:|_context:|_instance:|HTMLDivElement|HTMLDocument|ReactiveEffect|EffectScope|^\s+\[\[3[0-9]m|^\s\s+\w+:|^\s+\[3[0-9]m|\[Circular \*\d+\]|: \[\d+m|\[\d+m<|reload:|parent:|next:|subTree:|update:|job:|render:|proxy:|exposed:|exposeProxy:|withProxy:|provides:|accessCache:|renderCache:|propsOptions:|emitsOptions:|emit:|emitted:|propsDefaults:|inheritAttrs:|suspense:|asyncDep:|asyncResolved:|isMounted:|isUnmounted:|isDeactivated:|__vue_app__|_vnode:|^\s+\},?\s*$$|^\s+\]\s*$$|^\s+\}$$|^\s*\],?\s*$$' | \
-		cat -s
+	@set -o pipefail; npx vitest run --reporter=dot 2>&1 | scripts/filter-test-output.sh
 
 ci:
 	@echo "Running format..."
