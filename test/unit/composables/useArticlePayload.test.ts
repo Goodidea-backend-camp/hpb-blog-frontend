@@ -96,25 +96,84 @@ describe('useArticlePayload', () => {
     })
 
     describe('scheduled publish mode', () => {
-      it('should set published_at to scheduled time when publishing with schedule', () => {
-        const scheduledTime = '2024-02-01T15:30:00.000Z'
+      it('should convert local datetime to UTC when publishing with schedule', () => {
+        // Local datetime string (what user inputs in datetime-local field)
+        const localDateTime = '2024-02-01T15:30:00'
         const scheduledFormValues: ArticleFormValues = {
           ...baseFormValues,
           publishSetting: 'publish-scheduled',
-          scheduledDateTime: scheduledTime
+          scheduledDateTime: localDateTime
         }
 
         const result = buildNewArticlePayload(scheduledFormValues)
 
-        expect(result.published_at).toBe(new Date(scheduledTime).toISOString())
-        expect(result.published_at).toBe('2024-02-01T15:30:00.000Z')
+        // Result should be in UTC ISO format
+        expect(result.published_at).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+
+        // The UTC time should represent the same moment as the local time
+        const expectedUtcTime = new Date(localDateTime).toISOString()
+        expect(result.published_at).toBe(expectedUtcTime)
+      })
+
+      it('should handle scheduled time at different hours', () => {
+        const testCases = [
+          { local: '2024-02-01T00:00:00', description: 'midnight' },
+          { local: '2024-02-01T12:00:00', description: 'noon' },
+          { local: '2024-02-01T23:59:59', description: 'end of day' }
+        ]
+
+        testCases.forEach(({ local }) => {
+          const scheduledFormValues: ArticleFormValues = {
+            ...baseFormValues,
+            publishSetting: 'publish-scheduled',
+            scheduledDateTime: local
+          }
+
+          const result = buildNewArticlePayload(scheduledFormValues)
+
+          // Should convert correctly for each time
+          const expectedUtcTime = new Date(local).toISOString()
+          expect(result.published_at).toBe(expectedUtcTime)
+        })
+      })
+
+      it('should handle datetime without seconds', () => {
+        const localDateTime = '2024-02-01T15:30'
+        const scheduledFormValues: ArticleFormValues = {
+          ...baseFormValues,
+          publishSetting: 'publish-scheduled',
+          scheduledDateTime: localDateTime
+        }
+
+        const result = buildNewArticlePayload(scheduledFormValues)
+
+        // Should still produce valid UTC ISO string
+        expect(result.published_at).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+
+        const expectedUtcTime = new Date(localDateTime).toISOString()
+        expect(result.published_at).toBe(expectedUtcTime)
+      })
+
+      it('should handle year boundaries correctly', () => {
+        // Test New Year's Eve
+        const newYearsEve = '2024-12-31T23:59:59'
+        const scheduledFormValues: ArticleFormValues = {
+          ...baseFormValues,
+          publishSetting: 'publish-scheduled',
+          scheduledDateTime: newYearsEve
+        }
+
+        const result = buildNewArticlePayload(scheduledFormValues)
+
+        const expectedUtcTime = new Date(newYearsEve).toISOString()
+        expect(result.published_at).toBe(expectedUtcTime)
       })
 
       it('should ignore scheduled time when saving as draft', () => {
         const scheduledFormValues: ArticleFormValues = {
           ...baseFormValues,
           publishSetting: 'save-draft',
-          scheduledDateTime: '2024-02-01T15:30:00.000Z'
+          scheduledDateTime: '2024-02-01T15:30:00'
         }
 
         const result = buildNewArticlePayload(scheduledFormValues)
@@ -132,6 +191,18 @@ describe('useArticlePayload', () => {
         expect(() => {
           buildNewArticlePayload(scheduledFormValues)
         }).toThrow('scheduledDateTime is required for publish-scheduled action')
+      })
+
+      it('should throw error for invalid datetime string', () => {
+        const scheduledFormValues: ArticleFormValues = {
+          ...baseFormValues,
+          publishSetting: 'publish-scheduled',
+          scheduledDateTime: 'invalid-date'
+        }
+
+        expect(() => {
+          buildNewArticlePayload(scheduledFormValues)
+        }).toThrow('Invalid datetime string')
       })
     })
 
