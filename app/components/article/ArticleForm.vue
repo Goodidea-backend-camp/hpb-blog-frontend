@@ -82,11 +82,7 @@ const handleSubmit = articleForm.handleSubmit((articleFormValues) => {
 
 <template>
   <form class="space-y-6" @submit.prevent="handleSubmit">
-    <fieldset
-      :disabled="loading"
-      class="space-y-6"
-      :class="{ 'pointer-events-none opacity-60': loading }"
-    >
+    <fieldset :disabled="loading" class="space-y-6" :class="{ 'opacity-60': loading }">
       <!-- Title -->
       <FormField v-slot="{ componentField }" name="title">
         <FormItem>

@@ -224,9 +224,8 @@ describe('ArticleForm - Duplicate Submission Prevention', () => {
 
       const fieldset = wrapper.find('fieldset')
 
-      // Should have opacity and pointer-events classes
+      // Should have opacity classes
       expect(fieldset.classes()).toContain('opacity-60')
-      expect(fieldset.classes()).toContain('pointer-events-none')
     })
 
     it('should NOT apply visual feedback classes when not loading', async () => {
@@ -238,9 +237,8 @@ describe('ArticleForm - Duplicate Submission Prevention', () => {
 
       const fieldset = wrapper.find('fieldset')
 
-      // Should not have opacity and pointer-events classes
+      // Should not have opacityclasses
       expect(fieldset.classes()).not.toContain('opacity-60')
-      expect(fieldset.classes()).not.toContain('pointer-events-none')
     })
 
     it('should disable submit button when loading', async () => {
@@ -332,7 +330,6 @@ describe('ArticleForm - Duplicate Submission Prevention', () => {
       fieldset = wrapper.find('fieldset')
       expect(fieldset.attributes('disabled')).toBeDefined()
       expect(fieldset.classes()).toContain('opacity-60')
-      expect(fieldset.classes()).toContain('pointer-events-none')
     })
 
     it('should update UI when loading prop changes from true to false', async () => {
@@ -355,7 +352,6 @@ describe('ArticleForm - Duplicate Submission Prevention', () => {
       fieldset = wrapper.find('fieldset')
       expect(fieldset.attributes('disabled')).toBeUndefined()
       expect(fieldset.classes()).not.toContain('opacity-60')
-      expect(fieldset.classes()).not.toContain('pointer-events-none')
     })
   })
 
