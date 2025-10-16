@@ -4,6 +4,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { ARTICLE_ACTIONS, type ArticleAction } from '@/types/form'
+import { toast } from 'vue-sonner'
 
 interface Props {
   publishSetting: ArticleAction
@@ -29,7 +30,7 @@ const handlePublishSettingUpdate = (val: string) => {
   if (isValidArticleAction(val)) {
     emit('update:publishSetting', val)
   } else {
-    console.error(`Invalid article action: ${val}`)
+    toast.error(`Invalid article action: ${val}`)
   }
 }
 </script>

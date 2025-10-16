@@ -85,8 +85,9 @@ describe('useArticle', () => {
 
       const { list, articles, loading } = useArticle()
 
-      await expect(list()).rejects.toEqual(mockError)
+      const result = await list()
 
+      expect(result).toBeUndefined()
       expect(articles.value).toEqual([])
       expect(loading.value).toBe(false)
     })
@@ -99,8 +100,9 @@ describe('useArticle', () => {
 
       const { list, error } = useArticle()
 
-      await expect(list()).rejects.toEqual(mockError)
+      const result = await list()
 
+      expect(result).toBeUndefined()
       expect(toast.error).toHaveBeenCalledWith('Failed to load articles', {
         description: 'Server error'
       })
@@ -166,8 +168,9 @@ describe('useArticle', () => {
 
       expect(loading.value).toBe(false)
 
-      await expect(get(slug)).rejects.toEqual(mockError)
+      const result = await get(slug)
 
+      expect(result).toBeUndefined()
       expect(loading.value).toBe(false)
     })
 
@@ -179,8 +182,9 @@ describe('useArticle', () => {
 
       const { get, currentArticle } = useArticle()
 
-      await expect(get(slug)).rejects.toEqual(mockError)
+      const result = await get(slug)
 
+      expect(result).toBeUndefined()
       expect(currentArticle.value).toBe(null)
     })
 
@@ -193,8 +197,9 @@ describe('useArticle', () => {
 
       const { get, error } = useArticle()
 
-      await expect(get(slug)).rejects.toEqual(mockError)
+      const result = await get(slug)
 
+      expect(result).toBeUndefined()
       expect(toast.error).toHaveBeenCalledWith('Failed to load article', {
         description: 'Article not found'
       })
@@ -261,8 +266,9 @@ describe('useArticle', () => {
 
       expect(loading.value).toBe(false)
 
-      await expect(create(mockNewArticle)).rejects.toEqual(mockError)
+      const result = await create(mockNewArticle)
 
+      expect(result).toBeUndefined()
       expect(loading.value).toBe(false)
     })
 
@@ -294,8 +300,9 @@ describe('useArticle', () => {
       const { create, articles } = useArticle()
       articles.value = [...existingArticles]
 
-      await expect(create(mockNewArticle)).rejects.toEqual(mockError)
+      const result = await create(mockNewArticle)
 
+      expect(result).toBeUndefined()
       expect(articles.value).toEqual(existingArticles)
       expect(articles.value.length).toBe(2)
     })
@@ -308,7 +315,9 @@ describe('useArticle', () => {
 
       const { create } = useArticle()
 
-      await expect(create(mockNewArticle)).rejects.toEqual(mockError)
+      const result = await create(mockNewArticle)
+
+      expect(result).toBeUndefined()
     })
 
     it('should show toast error and set error state on create failure', async () => {
@@ -320,8 +329,9 @@ describe('useArticle', () => {
 
       const { create, error } = useArticle()
 
-      await expect(create(mockNewArticle)).rejects.toEqual(mockError)
+      const result = await create(mockNewArticle)
 
+      expect(result).toBeUndefined()
       expect(toast.error).toHaveBeenCalledWith('Failed to create article', {
         description: 'Invalid article data'
       })
@@ -390,8 +400,9 @@ describe('useArticle', () => {
 
       expect(loading.value).toBe(false)
 
-      await expect(update(slug, mockUpdateData)).rejects.toEqual(mockError)
+      const result = await update(slug, mockUpdateData)
 
+      expect(result).toBeUndefined()
       expect(loading.value).toBe(false)
     })
 
@@ -426,8 +437,9 @@ describe('useArticle', () => {
       const { update, articles } = useArticle()
       articles.value = [...existingArticles]
 
-      await expect(update(slug, mockUpdateData)).rejects.toEqual(mockError)
+      const result = await update(slug, mockUpdateData)
 
+      expect(result).toBeUndefined()
       expect(articles.value[1]?.title).toBe('Old Title')
       expect(articles.value.length).toBe(3)
     })
@@ -474,7 +486,9 @@ describe('useArticle', () => {
 
       const { update } = useArticle()
 
-      await expect(update(slug, mockUpdateData)).rejects.toEqual(mockError)
+      const result = await update(slug, mockUpdateData)
+
+      expect(result).toBeUndefined()
     })
 
     it('should show toast error and set error state on update failure', async () => {
@@ -487,8 +501,9 @@ describe('useArticle', () => {
 
       const { update, error } = useArticle()
 
-      await expect(update(slug, mockUpdateData)).rejects.toEqual(mockError)
+      const result = await update(slug, mockUpdateData)
 
+      expect(result).toBeUndefined()
       expect(toast.error).toHaveBeenCalledWith('Failed to update article', {
         description: 'Article not found'
       })
@@ -552,7 +567,7 @@ describe('useArticle', () => {
 
       expect(loading.value).toBe(false)
 
-      await expect(remove(slug)).rejects.toEqual(mockError)
+      await remove(slug)
 
       expect(loading.value).toBe(false)
     })
@@ -608,7 +623,9 @@ describe('useArticle', () => {
 
       const { remove } = useArticle()
 
-      await expect(remove(slug)).rejects.toEqual(mockError)
+      await remove(slug)
+
+      // Error is handled internally, no exception thrown
     })
 
     it('should show toast error and set error state on delete failure', async () => {
@@ -620,7 +637,7 @@ describe('useArticle', () => {
 
       const { remove, error } = useArticle()
 
-      await expect(remove(slug)).rejects.toEqual(mockError)
+      await remove(slug)
 
       expect(toast.error).toHaveBeenCalledWith('Failed to delete article', {
         description: 'Article not found'

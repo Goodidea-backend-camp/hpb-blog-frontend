@@ -1,4 +1,3 @@
-// Polyfill for requestAnimationFrame
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent, type Ref } from 'vue'
@@ -6,16 +5,17 @@ import NewArticlePage from '@/pages/admin/new-article.vue'
 import type { ArticleFormValues } from '@/types/form'
 import type { NewArticle } from '@/types/api'
 
-if (typeof window === 'undefined') {
-  global.requestAnimationFrame = (cb) => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    return setTimeout(cb, 0)
-  }
-  global.cancelAnimationFrame = (id) => {
-    clearTimeout(id)
-  }
-}
+// Mock data helper
+const createMockArticle = () => ({
+  id: 1,
+  author: { id: 1, username: 'testuser' },
+  title: 'Test Article',
+  slug: 'test-article',
+  content: 'Test content',
+  published_at: '2023-01-01T00:00:00Z',
+  created_at: '2023-01-01T00:00:00Z',
+  updated_at: '2023-01-01T00:00:00Z'
+})
 
 // Type definitions for mocks
 type MockRouter = {
@@ -48,7 +48,8 @@ vi.mock('vue-sonner', () => ({
 }))
 
 vi.mock('#imports', () => ({
-  definePageMeta: vi.fn()
+  definePageMeta: vi.fn(),
+  navigateTo: vi.fn()
 }))
 
 // Mock ArticleForm component
@@ -156,7 +157,7 @@ describe('new-article.vue', () => {
       vi.mocked(useRouter).mockReturnValue(mockRouter as never)
       vi.mocked(useArticle).mockReturnValue(mockUseArticle as never)
       vi.mocked(buildNewArticlePayload).mockReturnValue({} as NewArticle)
-      mockUseArticle.create.mockResolvedValue(undefined)
+      mockUseArticle.create.mockResolvedValue(createMockArticle())
 
       const wrapper = mount(NewArticlePage)
       const articleForm = wrapper.findComponent({ name: 'ArticleForm' })
@@ -183,7 +184,7 @@ describe('new-article.vue', () => {
       vi.mocked(useRouter).mockReturnValue(mockRouter as never)
       vi.mocked(useArticle).mockReturnValue(mockUseArticle as never)
       vi.mocked(buildNewArticlePayload).mockReturnValue({} as NewArticle)
-      mockUseArticle.create.mockResolvedValue(undefined)
+      mockUseArticle.create.mockResolvedValue(createMockArticle())
 
       const wrapper = mount(NewArticlePage)
       const articleForm = wrapper.findComponent({ name: 'ArticleForm' })
@@ -211,7 +212,7 @@ describe('new-article.vue', () => {
       vi.mocked(useRouter).mockReturnValue(mockRouter as never)
       vi.mocked(useArticle).mockReturnValue(mockUseArticle as never)
       vi.mocked(buildNewArticlePayload).mockReturnValue({} as NewArticle)
-      mockUseArticle.create.mockResolvedValue(undefined)
+      mockUseArticle.create.mockResolvedValue(createMockArticle())
 
       const wrapper = mount(NewArticlePage)
       const articleForm = wrapper.findComponent({ name: 'ArticleForm' })
@@ -268,7 +269,9 @@ describe('new-article.vue', () => {
 
       // Emit the submit event (this will trigger handleSubmit)
       articleForm.vm.$emit('submit', formValues)
-      await wrapper.vm.$nextTick()
+
+      // Wait for the async operation to complete (and fail)
+      await new Promise((resolve) => setTimeout(resolve, 10))
 
       // Verify create was called with the payload
       expect(mockUseArticle.create).toHaveBeenCalledWith(mockPayload)
@@ -328,7 +331,7 @@ describe('new-article.vue', () => {
       vi.mocked(useRouter).mockReturnValue(mockRouter as never)
       vi.mocked(useArticle).mockReturnValue(mockUseArticle as never)
       vi.mocked(buildNewArticlePayload).mockReturnValue({} as NewArticle)
-      mockUseArticle.create.mockResolvedValue(undefined)
+      mockUseArticle.create.mockResolvedValue(createMockArticle())
 
       const wrapper = mount(NewArticlePage)
       const articleForm = wrapper.findComponent({ name: 'ArticleForm' })
@@ -353,7 +356,7 @@ describe('new-article.vue', () => {
       vi.mocked(useRouter).mockReturnValue(mockRouter as never)
       vi.mocked(useArticle).mockReturnValue(mockUseArticle as never)
       vi.mocked(buildNewArticlePayload).mockReturnValue({} as NewArticle)
-      mockUseArticle.create.mockResolvedValue(undefined)
+      mockUseArticle.create.mockResolvedValue(createMockArticle())
 
       const wrapper = mount(NewArticlePage)
       const articleForm = wrapper.findComponent({ name: 'ArticleForm' })
@@ -379,7 +382,7 @@ describe('new-article.vue', () => {
       vi.mocked(useRouter).mockReturnValue(mockRouter as never)
       vi.mocked(useArticle).mockReturnValue(mockUseArticle as never)
       vi.mocked(buildNewArticlePayload).mockReturnValue({} as NewArticle)
-      mockUseArticle.create.mockResolvedValue(undefined)
+      mockUseArticle.create.mockResolvedValue(createMockArticle())
 
       const wrapper = mount(NewArticlePage)
       const articleForm = wrapper.findComponent({ name: 'ArticleForm' })

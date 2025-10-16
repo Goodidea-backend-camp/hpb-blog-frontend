@@ -14,17 +14,15 @@ const { create, loading } = useArticle()
 
 // Submit handler
 const handleSubmit = async (articleFormValues: ArticleFormValues) => {
-  try {
-    const payload = buildNewArticlePayload(articleFormValues)
-    const _newArticle = await create(payload)
+  const payload = buildNewArticlePayload(articleFormValues)
+  const newArticle = await create(payload)
 
+  if (newArticle) {
     const message = getSuccessMessage(articleFormValues.publishSetting)
     toast.success(message)
 
-    // TODO: Once the edit page is ready, redirect to /admin/edit/{_newArticle.slug}
+    // TODO: Once the edit page is ready, redirect to /admin/edit/{newArticle.slug}
     await navigateTo('/admin')
-  } catch {
-    toast.error('An unexpected error occurred. Please try again.')
   }
 }
 

@@ -14,16 +14,15 @@ export function useArticle() {
   const apiClient = useApiClient()
 
   // Handle API errors with toast notification
-  const handleError = (e: unknown, message: string): never => {
+  const handleError = (e: unknown, message: string): void => {
     const apiError = e as ApiError
     error.value = apiError
     toast.error(message, {
       description: apiError.message
     })
-    throw e
   }
 
-  async function list() {
+  async function list(): Promise<Article[] | undefined> {
     loading.value = true
     error.value = null
 
@@ -33,12 +32,13 @@ export function useArticle() {
       return result
     } catch (e) {
       handleError(e, 'Failed to load articles')
+      return undefined
     } finally {
       loading.value = false
     }
   }
 
-  async function get(slug: string) {
+  async function get(slug: string): Promise<Article | undefined> {
     loading.value = true
     error.value = null
 
@@ -48,12 +48,13 @@ export function useArticle() {
       return result
     } catch (e) {
       handleError(e, 'Failed to load article')
+      return undefined
     } finally {
       loading.value = false
     }
   }
 
-  async function create(newArticle: NewArticle) {
+  async function create(newArticle: NewArticle): Promise<Article | undefined> {
     loading.value = true
     error.value = null
 
@@ -64,12 +65,13 @@ export function useArticle() {
       return result
     } catch (e) {
       handleError(e, 'Failed to create article')
+      return undefined
     } finally {
       loading.value = false
     }
   }
 
-  async function update(slug: string, updatedArticle: UpdateArticle) {
+  async function update(slug: string, updatedArticle: UpdateArticle): Promise<Article | undefined> {
     loading.value = true
     error.value = null
 
@@ -87,12 +89,13 @@ export function useArticle() {
       return result
     } catch (e) {
       handleError(e, 'Failed to update article')
+      return undefined
     } finally {
       loading.value = false
     }
   }
 
-  async function remove(slug: string) {
+  async function remove(slug: string): Promise<void> {
     loading.value = true
     error.value = null
 
