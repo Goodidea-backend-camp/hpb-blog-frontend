@@ -1,28 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { getUserTimezone, convertLocalToUTC, isValidDateTime } from '@/utils/datetime'
+import { convertLocalToUTC, isValidDateTime } from '@/utils/datetime'
 
 describe('datetime utilities', () => {
-  describe('getUserTimezone', () => {
-    it('should return a valid IANA timezone identifier', () => {
-      const timezone = getUserTimezone()
-
-      // Should be a non-empty string
-      expect(timezone).toBeTruthy()
-      expect(typeof timezone).toBe('string')
-
-      // Common format: Continent/City or UTC
-      // Examples: 'Asia/Taipei', 'America/New_York', 'Europe/London', 'UTC'
-      expect(timezone.length).toBeGreaterThan(0)
-    })
-
-    it('should return consistent timezone across multiple calls', () => {
-      const tz1 = getUserTimezone()
-      const tz2 = getUserTimezone()
-
-      expect(tz1).toBe(tz2)
-    })
-  })
-
   describe('convertLocalToUTC', () => {
     // Mock system timezone for consistent testing
     // We'll test with different timezones by mocking Date behavior

@@ -1,10 +1,6 @@
 import { isValid, parseISO } from 'date-fns'
 import { VALID_YEAR_MIN, VALID_YEAR_MAX } from '@/constants/datetime'
 
-export function getUserTimezone(): string {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone
-}
-
 export function convertLocalToUTC(localDateTimeString: string): string {
   if (!isValidDateTime(localDateTimeString)) {
     throw new Error(`Invalid datetime string: ${localDateTimeString}`)
