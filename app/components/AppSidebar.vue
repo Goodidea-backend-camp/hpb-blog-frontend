@@ -37,11 +37,11 @@ const data = {
       items: [
         {
           title: 'Article list',
-          url: '#'
+          url: '/admin'
         },
         {
           title: 'New article',
-          url: '#'
+          url: '/admin/new-article'
         }
       ]
     }
