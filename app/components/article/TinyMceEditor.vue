@@ -33,7 +33,6 @@ const emit = defineEmits<{
 
 // TinyMCE configuration
 const editorConfig = {
-  height: 500,
   menubar: false,
   plugins: ['lists', 'link', 'code', 'table', 'help', 'textpattern', 'autolink'],
   toolbar:
