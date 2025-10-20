@@ -1,21 +1,23 @@
 import { isValid, parseISO } from 'date-fns'
-import { VALID_YEAR_MIN, VALID_YEAR_MAX } from '@/constants/datetime'
+import { VALID_YEAR_MAX } from '@/constants/datetime'
 
 export function convertLocalToUTC(localDateTimeString: string): string {
-  if (!isValidDateTime(localDateTimeString)) {
+  const date = parseISO(localDateTimeString)
+  if (!isValid(date)) {
     throw new Error(`Invalid datetime string: ${localDateTimeString}`)
   }
-  const date = parseISO(localDateTimeString)
   return date.toISOString()
 }
 
-export function isValidDateTime(dateTimeString: string): boolean {
+export function isValidPublishDateTime(dateTimeString: string): boolean {
   const date = parseISO(dateTimeString)
 
   if (!isValid(date)) {
     return false
   }
 
+  const now = new Date()
   const year = date.getFullYear()
-  return year >= VALID_YEAR_MIN && year <= VALID_YEAR_MAX
+
+  return date.getTime() > now.getTime() && year <= VALID_YEAR_MAX
 }

@@ -1,7 +1,6 @@
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
-import { isValidDateTime } from '~/utils/datetime'
-import { VALID_YEAR_MIN, VALID_YEAR_MAX } from '@/constants/datetime'
+import { isValidPublishDateTime } from '~/utils/datetime'
 
 /**
  * Zod validation schema for article form
@@ -12,7 +11,7 @@ import { VALID_YEAR_MIN, VALID_YEAR_MAX } from '@/constants/datetime'
  * - content: Required, non-empty string
  * - publishSetting: Must be 'save-draft', 'publish-immediate', or 'publish-scheduled'
  * - scheduledDateTime: Required when publishSetting is 'publish-scheduled'
- *                      Must be a valid date with year between ${VALID_YEAR_MIN} and ${VALID_YEAR_MAX}
+ *                      Must be future date and time and less than ${VALID_YEAR_MAX}
  */
 export const articleFormSchema = toTypedSchema(
   z
@@ -31,10 +30,10 @@ export const articleFormSchema = toTypedSchema(
             message: 'Scheduled date and time is required',
             path: ['scheduledDateTime']
           })
-        } else if (!isValidDateTime(data.scheduledDateTime)) {
+        } else if (!isValidPublishDateTime(data.scheduledDateTime)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Please enter a valid date between ${VALID_YEAR_MIN} and ${VALID_YEAR_MAX}`,
+            message: 'Scheduled publish time must be in the future',
             path: ['scheduledDateTime']
           })
         }
