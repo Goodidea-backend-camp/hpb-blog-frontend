@@ -56,8 +56,6 @@ watchEffect(() => {
 })
 
 // Computed
-const isScheduledPublish = computed(() => articleForm.values.publishSetting === 'publish-scheduled')
-
 const submitButtonText = computed(() => {
   switch (articleForm.values.publishSetting) {
     case 'publish-immediate':
@@ -121,15 +119,16 @@ const handleSubmit = articleForm.handleSubmit((articleFormValues) => {
         <FormItem>
           <FormLabel>Publish Settings</FormLabel>
           <FormControl>
-            <PublishOptions
-              :publish-setting="value"
-              :scheduled-date-time="articleForm.values.scheduledDateTime"
-              :error="isScheduledPublish ? articleForm.errors.value.scheduledDateTime : undefined"
-              @update:publish-setting="handleChange"
-              @update:scheduled-date-time="
-                (val) => articleForm.setFieldValue('scheduledDateTime', val)
-              "
-            />
+            <PublishOptions :publish-setting="value" @update:publish-setting="handleChange">
+              <template #scheduled-date-time>
+                <FormField v-slot="{ componentField }" name="scheduledDateTime">
+                  <FormControl>
+                    <Input v-bind="componentField" type="datetime-local" />
+                  </FormControl>
+                  <FormMessage />
+                </FormField>
+              </template>
+            </PublishOptions>
           </FormControl>
         </FormItem>
       </FormField>

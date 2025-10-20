@@ -2,22 +2,18 @@
 import { computed } from 'vue'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
 import { ARTICLE_ACTIONS, type ArticleAction } from '@/types/form'
 import { toast } from 'vue-sonner'
 
 interface Props {
   publishSetting: ArticleAction
-  scheduledDateTime?: string
   disabled?: boolean
-  error?: string
 }
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
   'update:publishSetting': [value: ArticleAction]
-  'update:scheduledDateTime': [value: string]
 }>()
 
 const isScheduledPublish = computed(() => props.publishSetting === 'publish-scheduled')
@@ -54,17 +50,7 @@ const handlePublishSettingUpdate = (val: string) => {
       </div>
 
       <div v-if="isScheduledPublish" class="space-y-2">
-        <Input
-          :model-value="scheduledDateTime"
-          type="datetime-local"
-          :disabled="disabled"
-          @update:model-value="
-            (val: string | number) => emit('update:scheduledDateTime', String(val))
-          "
-        />
-        <p v-if="error" class="text-destructive text-sm font-medium">
-          {{ error }}
-        </p>
+        <slot name="scheduled-date-time" />
       </div>
 
       <div class="flex items-center gap-2">

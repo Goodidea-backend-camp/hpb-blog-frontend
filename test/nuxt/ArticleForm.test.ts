@@ -45,9 +45,10 @@ vi.mock('@/components/article/TinyMceEditor.vue', () => ({
 vi.mock('@/components/article/PublishOptions.vue', () => ({
   default: {
     name: 'PublishOptions',
-    props: ['publishSetting', 'scheduledDateTime', 'disabled', 'error'],
-    emits: ['update:publishSetting', 'update:scheduledDateTime'],
-    template: '<div class="publish-options-mock" :data-disabled="disabled"></div>'
+    props: ['publishSetting', 'disabled'],
+    emits: ['update:publishSetting'],
+    template:
+      '<div class="publish-options-mock" :data-disabled="disabled"><slot name="scheduled-date-time" /></div>'
   }
 }))
 
