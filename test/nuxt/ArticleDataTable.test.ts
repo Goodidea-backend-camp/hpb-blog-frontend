@@ -38,6 +38,45 @@ vi.mock('@/components/ui/button/Button.vue', () => ({
   }
 }))
 
+// Mock Dropdown Menu components
+vi.mock('@/components/ui/dropdown-menu/DropdownMenu.vue', () => ({
+  default: {
+    name: 'DropdownMenu',
+    template: '<div class="dropdown-menu"><slot /></div>'
+  }
+}))
+
+vi.mock('@/components/ui/dropdown-menu/DropdownMenuTrigger.vue', () => ({
+  default: {
+    name: 'DropdownMenuTrigger',
+    props: ['asChild'],
+    template: '<div class="dropdown-trigger"><slot /></div>'
+  }
+}))
+
+vi.mock('@/components/ui/dropdown-menu/DropdownMenuContent.vue', () => ({
+  default: {
+    name: 'DropdownMenuContent',
+    props: ['align'],
+    template: '<div class="dropdown-content"><slot /></div>'
+  }
+}))
+
+vi.mock('@/components/ui/dropdown-menu/DropdownMenuItem.vue', () => ({
+  default: {
+    name: 'DropdownMenuItem',
+    props: ['variant'],
+    template: '<div class="dropdown-item"><slot /></div>'
+  }
+}))
+
+vi.mock('@/components/ui/dropdown-menu/DropdownMenuSeparator.vue', () => ({
+  default: {
+    name: 'DropdownMenuSeparator',
+    template: '<div class="dropdown-separator"></div>'
+  }
+}))
+
 describe('ArticleDataTable', () => {
   describe('basic rendering', () => {
     it('should render table structure with data', async () => {
@@ -186,7 +225,7 @@ describe('ArticleDataTable', () => {
       expect(text).toMatch(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}/)
     })
 
-    it('should display Edit and Delete buttons', async () => {
+    it('should display dropdown menu with Edit and Delete options', async () => {
       const mockData = createMockArticlesList(1)
       const component = await mountSuspended(ArticleDataTable, {
         props: {
@@ -195,11 +234,14 @@ describe('ArticleDataTable', () => {
         }
       })
 
+      // Should have one dropdown trigger button per article
       const buttons = component.findAll('button')
-      const buttonTexts = buttons.map((b) => b.text())
+      expect(buttons.length).toBe(1)
 
-      expect(buttonTexts).toContain('Edit')
-      expect(buttonTexts).toContain('Delete')
+      // The component text should contain Edit and Delete (in dropdown menu items)
+      const text = component.text()
+      expect(text).toContain('Edit')
+      expect(text).toContain('Delete')
     })
   })
 
@@ -242,7 +284,7 @@ describe('ArticleDataTable', () => {
       expect(rows.length).toBe(3)
     })
 
-    it('should render correct number of action buttons for multiple articles', async () => {
+    it('should render correct number of dropdown menus for multiple articles', async () => {
       const mockData = createMockArticlesList(3)
       const component = await mountSuspended(ArticleDataTable, {
         props: {
@@ -252,14 +294,17 @@ describe('ArticleDataTable', () => {
       })
 
       const buttons = component.findAll('button')
-      // Each article should have Edit and Delete buttons (2 buttons × 3 articles = 6)
-      expect(buttons.length).toBe(6)
+      // Each article should have one dropdown trigger button (1 button × 3 articles = 3)
+      expect(buttons.length).toBe(3)
 
-      const editButtons = buttons.filter((b) => b.text() === 'Edit')
-      const deleteButtons = buttons.filter((b) => b.text() === 'Delete')
+      // The component text should contain Edit and Delete options for each article
+      const text = component.text()
+      // Count occurrences of Edit and Delete in the text
+      const editCount = (text.match(/Edit/g) || []).length
+      const deleteCount = (text.match(/Delete/g) || []).length
 
-      expect(editButtons.length).toBe(3)
-      expect(deleteButtons.length).toBe(3)
+      expect(editCount).toBe(3)
+      expect(deleteCount).toBe(3)
     })
   })
 

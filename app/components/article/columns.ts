@@ -3,6 +3,12 @@ import type { Article } from '@/types/api'
 import { h } from 'vue'
 import { convertUtcToLocal } from '@/utils/datetime'
 import Button from '@/components/ui/button/Button.vue'
+import DropdownMenu from '@/components/ui/dropdown-menu/DropdownMenu.vue'
+import DropdownMenuTrigger from '@/components/ui/dropdown-menu/DropdownMenuTrigger.vue'
+import DropdownMenuContent from '@/components/ui/dropdown-menu/DropdownMenuContent.vue'
+import DropdownMenuItem from '@/components/ui/dropdown-menu/DropdownMenuItem.vue'
+import DropdownMenuSeparator from '@/components/ui/dropdown-menu/DropdownMenuSeparator.vue'
+import { MoreHorizontal, Pencil, Trash2 } from 'lucide-vue-next'
 
 export const columns: ColumnDef<Article>[] = [
   {
@@ -30,23 +36,25 @@ export const columns: ColumnDef<Article>[] = [
     id: 'actions',
     header: 'Actions',
     cell: () => {
-      return h('div', { class: 'flex gap-2' }, [
-        h(
-          Button,
-          {
-            variant: 'outline',
-            size: 'sm'
-          },
-          () => 'Edit'
+      return h(DropdownMenu, {}, () => [
+        h(DropdownMenuTrigger, { asChild: true }, () =>
+          h(
+            Button,
+            {
+              variant: 'ghost',
+              size: 'icon'
+            },
+            () => h(MoreHorizontal, { class: 'h-4 w-4' })
+          )
         ),
-        h(
-          Button,
-          {
-            variant: 'destructive',
-            size: 'sm'
-          },
-          () => 'Delete'
-        )
+        h(DropdownMenuContent, { align: 'end' }, () => [
+          h(DropdownMenuItem, {}, () => [h(Pencil, { class: 'mr-2 h-4 w-4' }), 'Edit']),
+          h(DropdownMenuSeparator),
+          h(DropdownMenuItem, { variant: 'destructive' }, () => [
+            h(Trash2, { class: 'mr-2 h-4 w-4' }),
+            'Delete'
+          ])
+        ])
       ])
     }
   }

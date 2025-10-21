@@ -39,7 +39,7 @@ export function useApiClient() {
         query: options.query
       })
 
-      return response
+      return response as T
     } catch (error: unknown) {
       // Transform $fetch error into ApiError based on backend API spec
       const errorObj = error as {
