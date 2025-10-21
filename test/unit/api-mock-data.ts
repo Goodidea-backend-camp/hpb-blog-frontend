@@ -7,6 +7,7 @@ import type {
   LoginRequest,
   LoginResponse
 } from '@/types/api'
+import { ApiError } from '@/utils/errors'
 
 export const createMockUser = (overrides: Partial<LoginUser> = {}): LoginUser => ({
   username: 'testuser',
@@ -57,6 +58,10 @@ export const createMockLoginResponse = (overrides: Partial<LoginResponse> = {}):
   ...overrides
 })
 
+/**
+ * Create mock $fetch error (for mocking fetch errors in useApiClient tests)
+ * Returns the error format that $fetch throws
+ */
 export const createMockApiError = (
   statusCode: number = 500,
   message: string = 'Internal Server Error'
@@ -64,8 +69,20 @@ export const createMockApiError = (
   statusCode,
   status: statusCode,
   data: { code: statusCode, message },
-  message
+  message,
+  name: 'FetchError'
 })
+
+/**
+ * Create actual ApiError instance (for testing error state in composables)
+ * Use this when you need a real ApiError object, not a $fetch error mock
+ */
+export const createApiErrorInstance = (
+  statusCode: number = 500,
+  message: string = 'Internal Server Error'
+): ApiError => {
+  return new ApiError(message, statusCode, { code: statusCode, message }, statusCode)
+}
 
 /**
  * Create mock API error with predefined messages for common status codes

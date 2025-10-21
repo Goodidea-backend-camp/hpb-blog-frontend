@@ -1,17 +1,28 @@
 import { useState } from '#app'
 import type { Article, NewArticle, UpdateArticle } from '@/types/api'
 import { useApiClient } from './useApiClient'
+import { toast } from 'vue-sonner'
+import type { ApiError } from '@/utils/errors'
 
 export function useArticle() {
   const articles = useState<Article[]>('articles', () => [])
   const currentArticle = useState<Article | null>('currentArticle', () => null)
   const loading = useState<boolean>('articles:loading', () => false)
-  const error = useState<Error | null>('articles:error', () => null)
+  const error = useState<ApiError | null>('articles:error', () => null)
 
   // Get API client with automatic token injection
   const apiClient = useApiClient()
 
-  async function list() {
+  // Handle API errors with toast notification
+  const handleError = (e: unknown, message: string): void => {
+    const apiError = e as ApiError
+    error.value = apiError
+    toast.error(message, {
+      description: apiError.message
+    })
+  }
+
+  async function list(): Promise<Article[] | undefined> {
     loading.value = true
     error.value = null
 
@@ -20,14 +31,14 @@ export function useArticle() {
       articles.value = result
       return result
     } catch (e) {
-      error.value = e as Error
-      throw e
+      handleError(e, 'Failed to load articles')
+      return undefined
     } finally {
       loading.value = false
     }
   }
 
-  async function get(slug: string) {
+  async function get(slug: string): Promise<Article | undefined> {
     loading.value = true
     error.value = null
 
@@ -36,14 +47,14 @@ export function useArticle() {
       currentArticle.value = result
       return result
     } catch (e) {
-      error.value = e as Error
-      throw e
+      handleError(e, 'Failed to load article')
+      return undefined
     } finally {
       loading.value = false
     }
   }
 
-  async function create(newArticle: NewArticle) {
+  async function create(newArticle: NewArticle): Promise<Article | undefined> {
     loading.value = true
     error.value = null
 
@@ -53,14 +64,14 @@ export function useArticle() {
       articles.value = [result, ...articles.value]
       return result
     } catch (e) {
-      error.value = e as Error
-      throw e
+      handleError(e, 'Failed to create article')
+      return undefined
     } finally {
       loading.value = false
     }
   }
 
-  async function update(slug: string, updatedArticle: UpdateArticle) {
+  async function update(slug: string, updatedArticle: UpdateArticle): Promise<Article | undefined> {
     loading.value = true
     error.value = null
 
@@ -77,14 +88,14 @@ export function useArticle() {
       }
       return result
     } catch (e) {
-      error.value = e as Error
-      throw e
+      handleError(e, 'Failed to update article')
+      return undefined
     } finally {
       loading.value = false
     }
   }
 
-  async function remove(slug: string) {
+  async function remove(slug: string): Promise<void> {
     loading.value = true
     error.value = null
 
@@ -97,8 +108,7 @@ export function useArticle() {
         currentArticle.value = null
       }
     } catch (e) {
-      error.value = e as Error
-      throw e
+      handleError(e, 'Failed to delete article')
     } finally {
       loading.value = false
     }

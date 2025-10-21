@@ -15,16 +15,15 @@ lint:
 
 lint-llm:
 	@set -o pipefail; \
-	(npx eslint . 2>&1 | grep -v -E '^\[nuxt\]|\[info\]|^ℹ|\[nitro\]') & \
-	(npx nuxt typecheck 2>&1 | grep -v -E '^\[nuxt\]|\[info\]|^ℹ|\[nitro\]|.*\[.*ms\]|.*↳|@tailwindcss') & \
+	(npx eslint . 2>&1 | scripts/filter-eslint-output.sh) & \
+	(npx nuxt typecheck 2>&1 | scripts/filter-typecheck-output.sh) & \
 	wait
 
 test:
 	@npx vitest run 
 
 test-llm:
-	@set -o pipefail; npx vitest run --reporter=dot 2>&1 | \
-		grep -v -E '^\[nuxt\]|\[info\]|^ℹ|\[nitro\]|.*\[.*ms\]|.*↳|\(node:.*\) Warning:|Use.*--trace-warnings|^·+$$|@tailwindcss'
+	@set -o pipefail; npx vitest run --reporter=dot 2>&1 | scripts/filter-test-output.sh
 
 ci:
 	@echo "Running format..."
