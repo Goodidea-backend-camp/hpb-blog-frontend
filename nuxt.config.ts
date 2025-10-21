@@ -11,9 +11,11 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    '/api/**': {
-      proxy: `http://backend:${backendPort}/**`
-    },
+    // TEMPORARILY DISABLED: Using Nitro dev server mock APIs instead
+    // Uncomment when backend server is ready
+    // '/api/**': {
+    //   proxy: `http://backend:${backendPort}/**`
+    // },
     '/admin/**': {
       ssr: false
     }
