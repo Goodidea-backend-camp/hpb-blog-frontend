@@ -1,4 +1,4 @@
-import { isValid, parseISO } from 'date-fns'
+import { format, isValid, parseISO } from 'date-fns'
 import { VALID_YEAR_MAX } from '@/constants/datetime'
 
 export function convertLocalToUTC(localDateTimeString: string): string {
@@ -7,6 +7,14 @@ export function convertLocalToUTC(localDateTimeString: string): string {
     throw new Error(`Invalid datetime string: ${localDateTimeString}`)
   }
   return date.toISOString()
+}
+
+export function convertUtcToLocal(utcDateTimeString: string): string {
+  const date = parseISO(utcDateTimeString)
+  if (!isValid(date)) {
+    throw new Error(`Invalid datetime string: ${utcDateTimeString}`)
+  }
+  return format(date, 'yyyy-MM-dd HH:mm')
 }
 
 export function isValidPublishDateTime(dateTimeString: string): boolean {

@@ -1,7 +1,139 @@
 import { describe, it, expect } from 'vitest'
-import { convertLocalToUTC, isValidPublishDateTime } from '@/utils/datetime'
+import { convertLocalToUTC, convertUtcToLocal, isValidPublishDateTime } from '@/utils/datetime'
 
 describe('datetime utilities', () => {
+  describe('convertUtcToLocal', () => {
+    describe('basic conversion', () => {
+      it('should convert UTC ISO string to local datetime format (yyyy-MM-dd HH:mm)', () => {
+        const utcDateTime = '2024-01-15T10:30:00Z'
+        const result = convertUtcToLocal(utcDateTime)
+
+        // Result should match the format yyyy-MM-dd HH:mm
+        expect(result).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/)
+      })
+
+      it('should handle UTC datetime string without Z suffix', () => {
+        const utcDateTime = '2024-01-15T10:30:00'
+        const result = convertUtcToLocal(utcDateTime)
+
+        expect(result).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/)
+      })
+
+      it('should handle UTC datetime string with milliseconds', () => {
+        const utcDateTime = '2024-01-15T10:30:45.123Z'
+        const result = convertUtcToLocal(utcDateTime)
+
+        expect(result).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/)
+      })
+
+      it('should preserve date components in local time', () => {
+        const utcDateTime = '2024-06-15T00:00:00Z'
+        const result = convertUtcToLocal(utcDateTime)
+
+        // Parse the date to verify it's close to the original
+        const parsedDate = new Date(result)
+        expect(parsedDate.getFullYear()).toBe(2024)
+        expect(parsedDate.getMonth()).toBe(5) // June (0-indexed)
+      })
+    })
+
+    describe('edge cases', () => {
+      it('should handle midnight UTC', () => {
+        const midnight = '2024-01-15T00:00:00Z'
+        const result = convertUtcToLocal(midnight)
+
+        expect(result).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/)
+      })
+
+      it('should handle end of day UTC', () => {
+        const endOfDay = '2024-01-15T23:59:00Z'
+        const result = convertUtcToLocal(endOfDay)
+
+        expect(result).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/)
+      })
+
+      it('should handle year boundary (New Year)', () => {
+        const newYear = '2024-01-01T00:00:00Z'
+        const result = convertUtcToLocal(newYear)
+
+        expect(result).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/)
+      })
+
+      it('should handle leap year date (Feb 29)', () => {
+        const leapDay = '2024-02-29T12:00:00Z'
+        const result = convertUtcToLocal(leapDay)
+
+        expect(result).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/)
+        // Verify February is preserved
+        const parsedDate = new Date(result)
+        expect(parsedDate.getMonth()).toBe(1) // February (0-indexed)
+      })
+    })
+
+    describe('format verification', () => {
+      it('should format single-digit hours with leading zero', () => {
+        const utcDateTime = '2024-01-15T01:05:00Z'
+        const result = convertUtcToLocal(utcDateTime)
+
+        expect(result).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/)
+        // Should have leading zeros
+        expect(result.split(' ')[1]).toMatch(/^\d{2}:\d{2}$/)
+      })
+
+      it('should format single-digit minutes with leading zero', () => {
+        const utcDateTime = '2024-01-15T10:05:00Z'
+        const result = convertUtcToLocal(utcDateTime)
+
+        const timePart = result.split(' ')[1]
+        expect(timePart).toMatch(/^\d{2}:\d{2}$/)
+      })
+
+      it('should not include seconds in output', () => {
+        const utcDateTime = '2024-01-15T10:30:45Z'
+        const result = convertUtcToLocal(utcDateTime)
+
+        // Should only have HH:mm, not HH:mm:ss
+        const timePart = result.split(' ')[1]
+        expect(timePart?.split(':').length).toBe(2)
+      })
+    })
+
+    describe('invalid input handling', () => {
+      it('should throw error for invalid datetime string', () => {
+        expect(() => convertUtcToLocal('invalid-date')).toThrow('Invalid datetime string')
+      })
+
+      it('should throw error for empty string', () => {
+        expect(() => convertUtcToLocal('')).toThrow('Invalid datetime string')
+      })
+
+      it('should throw error for malformed datetime', () => {
+        expect(() => convertUtcToLocal('2024-13-45T99:99:99')).toThrow('Invalid datetime string')
+      })
+
+      it('should throw error for non-existent date', () => {
+        expect(() => convertUtcToLocal('2024-02-30T12:00:00Z')).toThrow('Invalid datetime string')
+      })
+    })
+
+    describe('real-world API response formats', () => {
+      it('should handle typical API response format', () => {
+        // Typical backend response format
+        const apiDateTime = '2023-10-27T10:00:00Z'
+        const result = convertUtcToLocal(apiDateTime)
+
+        expect(result).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/)
+      })
+
+      it('should handle ISO format with timezone offset', () => {
+        const dateTimeWithOffset = '2024-01-15T10:30:00+00:00'
+        const result = convertUtcToLocal(dateTimeWithOffset)
+
+        expect(result).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/)
+      })
+    })
+  })
+
   describe('convertLocalToUTC', () => {
     // Mock system timezone for consistent testing
     // We'll test with different timezones by mocking Date behavior

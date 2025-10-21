@@ -1,17 +1,35 @@
-<script setup>
+<script setup lang="ts">
+import { computed, onMounted } from 'vue'
+import { definePageMeta } from '#imports'
+import { useArticle } from '@/composables/useArticle'
+import ArticleDataTable from '@/components/article/ArticleDataTable.vue'
+import { columns } from '@/components/article/columns'
+
 definePageMeta({
   layout: 'admin'
+})
+
+const { articles, list } = useArticle()
+
+// Sort articles by created_at DESC
+const sortedArticles = computed(() => {
+  return [...articles.value].sort((a, b) => {
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  })
+})
+
+onMounted(async () => {
+  await list()
 })
 </script>
 
 <template>
   <div>
-    <div class="prose mb-6 max-w-none">
-      <!-- TODO -->
+    <div data-testid="admin-main-content" class="rounded-xl">
+      <div class="mb-6">
+        <h1 class="text-3xl font-bold">Articles</h1>
+      </div>
+      <ArticleDataTable :columns="columns" :data="sortedArticles" />
     </div>
-    <div
-      data-testid="admin-main-content"
-      class="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min"
-    />
   </div>
 </template>
