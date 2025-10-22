@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { convertLocalToUTC, convertUtcToLocal, isValidPublishDateTime } from '@/utils/datetime'
+import { convertLocalToUtc, convertUtcToLocal, isValidPublishDateTime } from '@/utils/datetime'
 
 describe('datetime utilities', () => {
   describe('convertUtcToLocal', () => {
@@ -134,14 +134,14 @@ describe('datetime utilities', () => {
     })
   })
 
-  describe('convertLocalToUTC', () => {
+  describe('convertLocalToUtc', () => {
     // Mock system timezone for consistent testing
     // We'll test with different timezones by mocking Date behavior
 
     describe('basic conversion', () => {
       it('should convert local datetime string to UTC ISO format', () => {
         const localDateTime = '2024-01-15T10:30:00'
-        const result = convertLocalToUTC(localDateTime)
+        const result = convertLocalToUtc(localDateTime)
 
         // Result should be a valid UTC ISO string
         expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
@@ -153,14 +153,14 @@ describe('datetime utilities', () => {
 
       it('should handle datetime string without seconds', () => {
         const localDateTime = '2024-01-15T10:30'
-        const result = convertLocalToUTC(localDateTime)
+        const result = convertLocalToUtc(localDateTime)
 
         expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
       })
 
       it('should preserve the date and time values when converting', () => {
         const localDateTime = '2024-01-15T10:30:45'
-        const result = convertLocalToUTC(localDateTime)
+        const result = convertLocalToUtc(localDateTime)
 
         const originalDate = new Date(localDateTime)
         const resultDate = new Date(result)
@@ -173,7 +173,7 @@ describe('datetime utilities', () => {
     describe('timezone offset handling', () => {
       it('should handle midnight edge case', () => {
         const midnight = '2024-01-15T00:00:00'
-        const result = convertLocalToUTC(midnight)
+        const result = convertLocalToUtc(midnight)
 
         expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
 
@@ -183,7 +183,7 @@ describe('datetime utilities', () => {
 
       it('should handle end of day edge case', () => {
         const endOfDay = '2024-01-15T23:59:59'
-        const result = convertLocalToUTC(endOfDay)
+        const result = convertLocalToUtc(endOfDay)
 
         expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
 
@@ -200,7 +200,7 @@ describe('datetime utilities', () => {
         futureNewYear.setHours(0, 0, 0, 0)
 
         const newYear = futureNewYear.toISOString().slice(0, 19)
-        const result = convertLocalToUTC(newYear)
+        const result = convertLocalToUtc(newYear)
 
         const resultDate = new Date(result)
         expect(resultDate.getTime()).toBe(new Date(newYear).getTime())
@@ -209,7 +209,7 @@ describe('datetime utilities', () => {
       it('should handle leap year date (Feb 29)', () => {
         // Use 2028 which is a future leap year
         const leapDay = '2028-02-29T12:00:00'
-        const result = convertLocalToUTC(leapDay)
+        const result = convertLocalToUtc(leapDay)
 
         const resultDate = new Date(result)
         expect(resultDate.getMonth()).toBe(1) // February (0-indexed)
@@ -223,7 +223,7 @@ describe('datetime utilities', () => {
         futureYear.setHours(23, 59, 59, 0)
 
         const endOfYear = futureYear.toISOString().slice(0, 19)
-        const result = convertLocalToUTC(endOfYear)
+        const result = convertLocalToUtc(endOfYear)
 
         const resultDate = new Date(result)
         expect(resultDate.getTime()).toBe(new Date(endOfYear).getTime())
@@ -231,7 +231,7 @@ describe('datetime utilities', () => {
 
       it('should handle maximum valid year (2100)', () => {
         const maxYear = '2100-12-31T23:59:59'
-        const result = convertLocalToUTC(maxYear)
+        const result = convertLocalToUtc(maxYear)
 
         const resultDate = new Date(result)
         expect(resultDate.getFullYear()).toBe(2100)
@@ -240,34 +240,34 @@ describe('datetime utilities', () => {
 
     describe('invalid input handling', () => {
       it('should throw error for invalid datetime string', () => {
-        expect(() => convertLocalToUTC('invalid-date')).toThrow('Invalid datetime string')
+        expect(() => convertLocalToUtc('invalid-date')).toThrow('Invalid datetime string')
       })
 
       it('should throw error for empty string', () => {
-        expect(() => convertLocalToUTC('')).toThrow('Invalid datetime string')
+        expect(() => convertLocalToUtc('')).toThrow('Invalid datetime string')
       })
 
       it('should throw error for malformed datetime', () => {
-        expect(() => convertLocalToUTC('2024-13-45T99:99:99')).toThrow('Invalid datetime string')
+        expect(() => convertLocalToUtc('2024-13-45T99:99:99')).toThrow('Invalid datetime string')
       })
 
       it('should throw error for non-existent date', () => {
         // February 30 doesn't exist
-        expect(() => convertLocalToUTC('2024-02-30T12:00:00')).toThrow('Invalid datetime string')
+        expect(() => convertLocalToUtc('2024-02-30T12:00:00')).toThrow('Invalid datetime string')
       })
     })
 
     describe('different datetime formats', () => {
       it('should handle ISO format with milliseconds', () => {
         const withMs = '2024-01-15T10:30:45.123'
-        const result = convertLocalToUTC(withMs)
+        const result = convertLocalToUtc(withMs)
 
         expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
       })
 
       it('should handle compact format (YYYY-MM-DDTHH:mm)', () => {
         const compact = '2024-01-15T10:30'
-        const result = convertLocalToUTC(compact)
+        const result = convertLocalToUtc(compact)
 
         expect(result).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
       })
