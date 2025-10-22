@@ -29,6 +29,23 @@ vi.mock('@/components/ui/table', () => ({
   }
 }))
 
+// Mock Skeleton component
+vi.mock('@/components/ui/skeleton', () => ({
+  Skeleton: {
+    name: 'Skeleton',
+    props: ['class'],
+    template: '<div class="skeleton" :class="class"></div>'
+  }
+}))
+
+// Mock ArticleTableSkeleton component
+vi.mock('@/components/article-list/ArticleTableSkeleton.vue', () => ({
+  default: {
+    name: 'ArticleTableSkeleton',
+    template: '<div data-testid="article-table-skeleton">Loading...</div>'
+  }
+}))
+
 // Mock Button component
 vi.mock('@/components/ui/button/Button.vue', () => ({
   default: {
@@ -84,7 +101,8 @@ describe('ArticleDataTable', () => {
       const component = await mountSuspended(ArticleDataTable, {
         props: {
           columns: columns as ColumnDef<unknown, unknown>[],
-          data: mockData
+          data: mockData,
+          loading: false
         }
       })
 
@@ -97,7 +115,8 @@ describe('ArticleDataTable', () => {
       const component = await mountSuspended(ArticleDataTable, {
         props: {
           columns: columns as ColumnDef<unknown, unknown>[],
-          data: mockData
+          data: mockData,
+          loading: false
         }
       })
 
@@ -117,7 +136,8 @@ describe('ArticleDataTable', () => {
       const component = await mountSuspended(ArticleDataTable, {
         props: {
           columns: columns as ColumnDef<unknown, unknown>[],
-          data: mockData
+          data: mockData,
+          loading: false
         }
       })
 
@@ -134,7 +154,8 @@ describe('ArticleDataTable', () => {
       const component = await mountSuspended(ArticleDataTable, {
         props: {
           columns: columns as ColumnDef<unknown, unknown>[],
-          data: []
+          data: [],
+          loading: false
         }
       })
 
@@ -146,7 +167,8 @@ describe('ArticleDataTable', () => {
       const component = await mountSuspended(ArticleDataTable, {
         props: {
           columns: columns as ColumnDef<unknown, unknown>[],
-          data: []
+          data: [],
+          loading: false
         }
       })
 
@@ -164,7 +186,8 @@ describe('ArticleDataTable', () => {
       const component = await mountSuspended(ArticleDataTable, {
         props: {
           columns: columns as ColumnDef<unknown, unknown>[],
-          data: mockData
+          data: mockData,
+          loading: false
         }
       })
 
@@ -181,7 +204,8 @@ describe('ArticleDataTable', () => {
       const component = await mountSuspended(ArticleDataTable, {
         props: {
           columns: columns as ColumnDef<unknown, unknown>[],
-          data: mockData
+          data: mockData,
+          loading: false
         }
       })
 
@@ -198,7 +222,8 @@ describe('ArticleDataTable', () => {
       const component = await mountSuspended(ArticleDataTable, {
         props: {
           columns: columns as ColumnDef<unknown, unknown>[],
-          data: mockData
+          data: mockData,
+          loading: false
         }
       })
 
@@ -216,7 +241,8 @@ describe('ArticleDataTable', () => {
       const component = await mountSuspended(ArticleDataTable, {
         props: {
           columns: columns as ColumnDef<unknown, unknown>[],
-          data: mockData
+          data: mockData,
+          loading: false
         }
       })
 
@@ -230,7 +256,8 @@ describe('ArticleDataTable', () => {
       const component = await mountSuspended(ArticleDataTable, {
         props: {
           columns: columns as ColumnDef<unknown, unknown>[],
-          data: mockData
+          data: mockData,
+          loading: false
         }
       })
 
@@ -270,7 +297,8 @@ describe('ArticleDataTable', () => {
       const component = await mountSuspended(ArticleDataTable, {
         props: {
           columns: columns as ColumnDef<unknown, unknown>[],
-          data: mockData
+          data: mockData,
+          loading: false
         }
       })
 
@@ -289,7 +317,8 @@ describe('ArticleDataTable', () => {
       const component = await mountSuspended(ArticleDataTable, {
         props: {
           columns: columns as ColumnDef<unknown, unknown>[],
-          data: mockData
+          data: mockData,
+          loading: false
         }
       })
 
@@ -309,18 +338,20 @@ describe('ArticleDataTable', () => {
   })
 
   describe('props validation', () => {
-    it('should accept columns and data props', async () => {
+    it('should accept columns, data, and loading props', async () => {
       const mockData = createMockArticlesList(2)
       const component = await mountSuspended(ArticleDataTable, {
         props: {
           columns: columns as ColumnDef<unknown, unknown>[],
-          data: mockData
+          data: mockData,
+          loading: false
         }
       })
 
       expect(component.props('columns')).toBeDefined()
       expect(component.props('data')).toBeDefined()
       expect(component.props('data').length).toBe(2)
+      expect(component.props('loading')).toBe(false)
     })
 
     it('should handle data prop updates', async () => {
@@ -328,7 +359,8 @@ describe('ArticleDataTable', () => {
       const component = await mountSuspended(ArticleDataTable, {
         props: {
           columns: columns as ColumnDef<unknown, unknown>[],
-          data: initialData
+          data: initialData,
+          loading: false
         }
       })
 
@@ -339,6 +371,104 @@ describe('ArticleDataTable', () => {
       await component.setProps({ data: newData })
 
       expect(component.findAll('tbody tr').length).toBe(3)
+    })
+  })
+
+  describe('loading state', () => {
+    it('should show skeleton when loading is true', async () => {
+      const mockData = createMockArticlesList(2)
+      const component = await mountSuspended(ArticleDataTable, {
+        props: {
+          columns: columns as ColumnDef<unknown, unknown>[],
+          data: mockData,
+          loading: true
+        }
+      })
+
+      const skeleton = component.find('[data-testid="article-table-skeleton"]')
+      expect(skeleton.exists()).toBe(true)
+      expect(skeleton.text()).toContain('Loading...')
+    })
+
+    it('should not show skeleton when loading is false', async () => {
+      const mockData = createMockArticlesList(2)
+      const component = await mountSuspended(ArticleDataTable, {
+        props: {
+          columns: columns as ColumnDef<unknown, unknown>[],
+          data: mockData,
+          loading: false
+        }
+      })
+
+      const skeleton = component.find('[data-testid="article-table-skeleton"]')
+      expect(skeleton.exists()).toBe(false)
+
+      // Should show actual table
+      const table = component.find('table')
+      expect(table.exists()).toBe(true)
+    })
+
+    it('should show empty state when not loading and data is empty', async () => {
+      const component = await mountSuspended(ArticleDataTable, {
+        props: {
+          columns: columns as ColumnDef<unknown, unknown>[],
+          data: [],
+          loading: false
+        }
+      })
+
+      const skeleton = component.find('[data-testid="article-table-skeleton"]')
+      expect(skeleton.exists()).toBe(false)
+
+      const emptyMessage = component.text()
+      expect(emptyMessage).toContain('No articles found.')
+    })
+
+    it('should show data table when not loading and data exists', async () => {
+      const mockData = createMockArticlesList(2)
+      const component = await mountSuspended(ArticleDataTable, {
+        props: {
+          columns: columns as ColumnDef<unknown, unknown>[],
+          data: mockData,
+          loading: false
+        }
+      })
+
+      const skeleton = component.find('[data-testid="article-table-skeleton"]')
+      expect(skeleton.exists()).toBe(false)
+
+      const rows = component.findAll('tbody tr')
+      expect(rows.length).toBe(2)
+
+      const emptyMessage = component.text()
+      expect(emptyMessage).not.toContain('No articles found.')
+    })
+
+    it('should toggle between loading and data states', async () => {
+      const mockData = createMockArticlesList(2)
+      const component = await mountSuspended(ArticleDataTable, {
+        props: {
+          columns: columns as ColumnDef<unknown, unknown>[],
+          data: mockData,
+          loading: true
+        }
+      })
+
+      // Initially loading
+      let skeleton = component.find('[data-testid="article-table-skeleton"]')
+      expect(skeleton.exists()).toBe(true)
+
+      // Update to not loading
+      await component.setProps({ loading: false })
+
+      skeleton = component.find('[data-testid="article-table-skeleton"]')
+      expect(skeleton.exists()).toBe(false)
+
+      const table = component.find('table')
+      expect(table.exists()).toBe(true)
+
+      const rows = component.findAll('tbody tr')
+      expect(rows.length).toBe(2)
     })
   })
 })

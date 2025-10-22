@@ -9,7 +9,7 @@ definePageMeta({
   layout: 'admin'
 })
 
-const { articles, list } = useArticle()
+const { articles, list, loading } = useArticle()
 
 // Sort articles by created_at DESC
 const sortedArticles = computed(() => {
@@ -29,7 +29,7 @@ onMounted(async () => {
       <div class="mb-6">
         <h1 class="text-3xl font-bold">Articles</h1>
       </div>
-      <ArticleDataTable :columns="columns" :data="sortedArticles" />
+      <ArticleDataTable :columns="columns" :data="sortedArticles" :loading="loading" />
     </div>
   </div>
 </template>

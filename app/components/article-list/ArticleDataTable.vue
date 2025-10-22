@@ -10,10 +10,12 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
+import ArticleTableSkeleton from './ArticleTableSkeleton.vue'
 
 const props = defineProps<{
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  loading: boolean
 }>()
 
 const sorting = ref<SortingState>([])
@@ -40,7 +42,8 @@ const table = useVueTable({
 </script>
 
 <template>
-  <div class="rounded-md border">
+  <ArticleTableSkeleton v-if="loading" />
+  <div v-else class="rounded-md border">
     <Table>
       <TableHeader>
         <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
