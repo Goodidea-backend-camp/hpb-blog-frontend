@@ -9,7 +9,7 @@ definePageMeta({
   layout: 'admin'
 })
 
-const { articles, list, loading } = useArticle()
+const { articles, list, loading, error } = useArticle()
 
 // Sort articles by created_at DESC
 const sortedArticles = computed(() => {
@@ -17,6 +17,10 @@ const sortedArticles = computed(() => {
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   })
 })
+
+const handleRetry = async () => {
+  await list()
+}
 
 onMounted(async () => {
   await list()
@@ -29,7 +33,13 @@ onMounted(async () => {
       <div class="mb-6">
         <h1 class="text-3xl font-bold">Articles</h1>
       </div>
-      <ArticleDataTable :columns="columns" :data="sortedArticles" :loading="loading" />
+      <ArticleDataTable
+        :columns="columns"
+        :data="sortedArticles"
+        :loading="loading"
+        :error="error"
+        @retry="handleRetry"
+      />
     </div>
   </div>
 </template>

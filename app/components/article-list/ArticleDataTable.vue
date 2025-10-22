@@ -2,6 +2,7 @@
 import type { ColumnDef, SortingState } from '@tanstack/vue-table'
 import { FlexRender, getCoreRowModel, getSortedRowModel, useVueTable } from '@tanstack/vue-table'
 import { ref } from 'vue'
+import { AlertCircle, RefreshCw } from 'lucide-vue-next'
 import {
   Table,
   TableBody,
@@ -10,12 +11,19 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
 import ArticleTableSkeleton from './ArticleTableSkeleton.vue'
+import type { ApiError } from '@/utils/errors'
 
 const props = defineProps<{
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   loading: boolean
+  error: ApiError | null
+}>()
+
+const emit = defineEmits<{
+  retry: []
 }>()
 
 const sorting = ref<SortingState>([])
@@ -42,7 +50,27 @@ const table = useVueTable({
 </script>
 
 <template>
+  <!-- Loading skeleton -->
   <ArticleTableSkeleton v-if="loading" />
+  <!-- Error message and retry button -->
+  <div
+    v-else-if="error"
+    class="border-destructive/50 bg-destructive/10 rounded-md border p-8"
+    data-testid="error-state"
+  >
+    <div class="flex flex-col items-center justify-center gap-4 text-center">
+      <AlertCircle class="text-destructive size-12" />
+      <div class="space-y-2">
+        <h3 class="text-destructive text-lg font-semibold">Failed to load articles</h3>
+        <p class="text-muted-foreground text-sm">{{ error.message }}</p>
+      </div>
+      <Button variant="outline" class="mt-2" data-testid="retry-button" @click="emit('retry')">
+        <RefreshCw class="mr-2 size-4" />
+        Retry
+      </Button>
+    </div>
+  </div>
+  <!-- Data Table -->
   <div v-else class="rounded-md border">
     <Table>
       <TableHeader>
