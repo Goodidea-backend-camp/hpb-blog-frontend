@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import type { ColumnDef } from '@tanstack/vue-table'
-import ArticleDataTable from '@/components/article/ArticleDataTable.vue'
-import { columns } from '@/components/article/columns'
+import ArticleDataTable from '@/components/article-list/ArticleDataTable.vue'
+import { columns } from '@/components/article-list/columns'
 import { createMockArticle, createMockArticlesList } from '../unit/api-mock-data'
 
 // Mock UI Table components

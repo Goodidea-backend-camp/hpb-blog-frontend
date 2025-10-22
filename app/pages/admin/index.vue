@@ -2,8 +2,8 @@
 import { computed, onMounted } from 'vue'
 import { definePageMeta } from '#imports'
 import { useArticle } from '@/composables/useArticle'
-import ArticleDataTable from '@/components/article/ArticleDataTable.vue'
-import { columns } from '@/components/article/columns'
+import ArticleDataTable from '@/components/article-list/ArticleDataTable.vue'
+import { columns } from '@/components/article-list/columns'
 
 definePageMeta({
   layout: 'admin'

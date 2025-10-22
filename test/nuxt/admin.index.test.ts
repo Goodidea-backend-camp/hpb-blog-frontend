@@ -14,7 +14,7 @@ type MockUseArticle = {
 }
 
 // Mock ArticleDataTable component
-vi.mock('@/components/article/ArticleDataTable.vue', () => ({
+vi.mock('@/components/article-list/ArticleDataTable.vue', () => ({
   default: {
     name: 'ArticleDataTable',
     props: ['columns', 'data'],
@@ -23,7 +23,7 @@ vi.mock('@/components/article/ArticleDataTable.vue', () => ({
 }))
 
 // Mock columns
-vi.mock('@/components/article/columns', () => ({
+vi.mock('@/components/article-list/columns', () => ({
   columns: [
     { accessorKey: 'title', header: 'Title' },
     { accessorKey: 'published_at', header: 'Published At' },
