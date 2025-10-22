@@ -22,6 +22,15 @@ vi.mock('@/components/article-list/ArticleDataTable.vue', () => ({
   }
 }))
 
+// Mock Button component
+vi.mock('@/components/ui/button', () => ({
+  Button: {
+    name: 'Button',
+    props: ['variant', 'size'],
+    template: '<button data-testid="write-button" @click="$emit(\'click\')"><slot /></button>'
+  }
+}))
+
 // Mock columns
 vi.mock('@/components/article-list/columns', () => ({
   columns: [
@@ -36,6 +45,15 @@ vi.mock('@/components/article-list/columns', () => ({
 vi.mock('@/composables/useArticle', () => ({
   useArticle: vi.fn()
 }))
+
+// Mock router composables
+vi.mock('#app/composables/router', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('#app/composables/router')>()
+  return {
+    ...actual,
+    navigateTo: vi.fn()
+  }
+})
 
 // Mock #imports
 vi.mock('#imports', () => ({
@@ -80,10 +98,29 @@ describe('Admin Index Page', () => {
     expect(dataTable.exists()).toBe(true)
   })
 
+  it('should render Write button', async () => {
+    const component = await mountSuspended(AdminIndexPage)
+    const writeButton = component.find('[data-testid="write-button"]')
+    expect(writeButton.exists()).toBe(true)
+    expect(writeButton.text()).toContain('Write')
+  })
+
   it('should call list() on mount to fetch articles', async () => {
     await mountSuspended(AdminIndexPage)
 
     expect(mockUseArticle.list).toHaveBeenCalledTimes(1)
+  })
+
+  it('should navigate to new article page when Write button is clicked', async () => {
+    const { navigateTo } = await import('#app/composables/router')
+    vi.mocked(navigateTo).mockClear()
+
+    const component = await mountSuspended(AdminIndexPage)
+    const writeButton = component.find('[data-testid="write-button"]')
+
+    await writeButton.trigger('click')
+
+    expect(navigateTo).toHaveBeenCalledWith('/admin/new-article')
   })
 
   describe('integration with ArticleDataTable', () => {
