@@ -8,13 +8,14 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
+import { DEFAULT_SKELETON_ROWS } from '@/constants/ui'
 
 interface ArticleTableSkeletonProps {
   rows?: number
 }
 
 const props = withDefaults(defineProps<ArticleTableSkeletonProps>(), {
-  rows: 5
+  rows: DEFAULT_SKELETON_ROWS
 })
 </script>
 
