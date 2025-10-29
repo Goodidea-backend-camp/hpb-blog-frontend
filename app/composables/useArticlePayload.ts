@@ -1,5 +1,5 @@
 import { htmlToMarkdown } from '@/utils/markdown'
-import { convertLocalToUTC } from '@/utils/datetime'
+import { convertLocalToUtc } from '@/utils/datetime'
 import type { NewArticle } from '@/types/api'
 import type { ArticleFormValues, ArticleAction } from '@/types/form'
 
@@ -28,6 +28,6 @@ function getPublishedAt(action: ArticleAction, scheduledDateTime?: string): stri
       if (!scheduledDateTime) {
         throw new Error('scheduledDateTime is required for publish-scheduled action')
       }
-      return convertLocalToUTC(scheduledDateTime)
+      return convertLocalToUtc(scheduledDateTime)
   }
 }

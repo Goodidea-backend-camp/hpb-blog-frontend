@@ -18,7 +18,7 @@ export function useApiClient() {
       body?: unknown
       query?: Record<string, unknown>
     } = {}
-  ): Promise<T> {
+  ) {
     const url = joinURL(baseURL, endpoint)
 
     // Set default headers
@@ -32,14 +32,12 @@ export function useApiClient() {
     }
 
     try {
-      const response = await $fetch<T>(url, {
+      return await $fetch<T>(url, {
         method: options.method || 'GET',
         headers,
         body: options.body as Record<string, unknown> | BodyInit | null | undefined,
         query: options.query
       })
-
-      return response
     } catch (error: unknown) {
       // Transform $fetch error into ApiError based on backend API spec
       const errorObj = error as {
@@ -55,7 +53,7 @@ export function useApiClient() {
   }
 
   // GET request
-  async function get<T>(endpoint: string, query?: Record<string, unknown>): Promise<T> {
+  async function get<T>(endpoint: string, query?: Record<string, unknown>) {
     return request<T>(endpoint, {
       method: 'GET',
       query
@@ -63,7 +61,7 @@ export function useApiClient() {
   }
 
   // POST request
-  async function post<T>(endpoint: string, body?: unknown): Promise<T> {
+  async function post<T>(endpoint: string, body?: unknown) {
     return request<T>(endpoint, {
       method: 'POST',
       body
@@ -71,7 +69,7 @@ export function useApiClient() {
   }
 
   // PUT request
-  async function put<T>(endpoint: string, body?: unknown): Promise<T> {
+  async function put<T>(endpoint: string, body?: unknown) {
     return request<T>(endpoint, {
       method: 'PUT',
       body
@@ -79,7 +77,7 @@ export function useApiClient() {
   }
 
   // DELETE request
-  async function deleteRequest<T>(endpoint: string): Promise<T> {
+  async function deleteRequest<T>(endpoint: string) {
     return request<T>(endpoint, {
       method: 'DELETE'
     })
