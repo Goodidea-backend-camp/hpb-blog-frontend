@@ -4,15 +4,19 @@ import tailwindcss from '@tailwindcss/vite'
 const backendPort = process.env.BACKEND_PORT || '8080'
 const environment = process.env.ENVIRONMENT || 'dev'
 
-// 根據環境設定允許的主機
+// 從環境變數讀取允許的主機列表。如果沒有設定，則根據環境提供預設值
 const getAllowedHosts = () => {
+  const allowedHostsEnv = process.env.ALLOWED_HOSTS
+  
+  if (allowedHostsEnv) {
+    // 從環境變數讀取，移除空白並分割
+    return allowedHostsEnv.split(',').map((host: string) => host.trim()).filter((host: string) => host.length > 0)
+  }
+  
+  // 如果沒有設定環境變數，提供預設值
   switch (environment) {
     case 'dev':
-      return ['localhost', '127.0.0.1', 'www.hpb.testdata.work', 'admin.hpb.testdata.work', 'api.hpb.testdata.work']
-    case 'stage':
-      return ['www.hpb.stage.work', 'admin.hpb.stage.work', 'api.hpb.stage.work']
-    case 'prod':
-      return ['www.hpb.work', 'admin.hpb.work', 'api.hpb.work']
+      return ['localhost', '127.0.0.1']
     default:
       return ['localhost', '127.0.0.1']
   }
