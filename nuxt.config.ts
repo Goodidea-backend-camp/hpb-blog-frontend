@@ -32,11 +32,9 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    // TEMPORARILY DISABLED: Using Nitro dev server mock APIs instead
-    // Uncomment when backend server is ready
-    // '/api/**': {
-    //   proxy: `http://backend:${backendPort}/**`
-    // },
+    '/api/**': {
+      proxy: `http://backend:${backendPort}/**`
+    },
     '/admin/**': {
       ssr: false
     }
