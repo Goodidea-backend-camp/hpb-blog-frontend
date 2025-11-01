@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-const { data, error } = await useFetch('/api/')
+const { data, error } = await useFetch('/api/healthz')
 
 if (error.value) {
   console.error('Failed to fetch from backend:', error.value)
